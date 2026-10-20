@@ -15,7 +15,7 @@ namespace BzRental.Api
             // Add services to the container.
 
             builder.Services.AddDbContext<BzRentalDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionString"))
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
                 .WithExpressionExpanding()
                 .LogTo(msg => Debug.WriteLine(msg), new[] { DbLoggerCategory.Database.Command.Name }, LogLevel.Information)
 #if DEBUG

@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <Authors>Bartosz Zagalski</Authors>
+    <UserSecretsId>f7e7c2db-3f7a-40b9-b339-6d1bc4c8f4bd</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
