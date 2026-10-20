@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="BzRental.Api/BzRental.Api.csproj" />
+  <Project Path="BzRental.DbAccess/BzRental.DbAccess.csproj" />
   <Project Path="BzRental.Shared/BzRental.Shared.csproj" />
 </Solution>
