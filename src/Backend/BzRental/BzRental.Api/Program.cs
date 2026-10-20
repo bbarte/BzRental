@@ -1,5 +1,7 @@
 using BzRental.Api.Abstraction;
+using BzRental.Api.Auth;
 using BzRental.Api.Handlers;
+using BzRental.Application.Users.Services;
 using BzRental.DbAccess.Contexts;
 using BzRental.Shared.Abstraction;
 using LinqKit;
@@ -36,6 +38,8 @@ namespace BzRental.Api
 
             builder.Services.AddScoped<IPasswordHasher<object>, PasswordHasher<object>>();
             builder.Services.AddScoped<ISharedPasswordHasher, AspnetPasswordHasher>();
+            builder.Services.AddScoped<IUserProvider, JwtUserProvider>();
+            builder.Services.AddScoped<ITokenCreationService, TokenCreationService>();
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
