@@ -14,8 +14,11 @@ namespace BzRental.Application.Users
         public static IServiceCollection AddUserServices(this IServiceCollection services)
         {
             services.AddScoped<IValidator<LoginRequest>, LoginValidator>();
+            services.AddScoped<IValidator<RegisterUserRequest>, RegisterUserValidator>();
+            services.AddScoped<IValidator<ChangeUserPasswordRequest>, ChangeUserPasswordValidator>();
 
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IUsersService, UsersService>();
 
             return services;
         }
