@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BzRental.DbAccess\BzRental.DbAccess.csproj" />
+    <ProjectReference Include="..\BzRental.Domain\BzRental.Domain.csproj" />
+    <ProjectReference Include="..\BzRental.Shared\BzRental.Shared.csproj" />
+  </ItemGroup>
+
+</Project>
