@@ -134,5 +134,121 @@ namespace BzRental.Application.Users.Services
 
             return await dtoQuery.ToPaginatedListAsync(pagination);
         }
+
+        public async Task<Result> DeleteUser(int id)
+        {
+            var userInfo = await _ctx.Users
+                .Where(x => x.Id == id)
+                .Select(x => new
+                {
+                    x.IsAdmin
+                })
+                .FirstOrDefaultAsync();
+
+            if (userInfo == null)
+                return SharedErrors.NotFound;
+
+            bool areThereAnyOtherAdmins = !userInfo.IsAdmin
+                ? true
+                : await _ctx.Users.AnyAsync(x =>
+                    x.IsAdmin && !x.IsDeleted && !x.IsBlocked && x.Id != id);
+
+            if (!areThereAnyOtherAdmins)
+                return UserErrors.OperationWouldBlockAccess;
+
+            await _ctx.Users
+                .Where(x => x.Id == id)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(x => x.IsDeleted, true));
+
+            return Result.Success();
+        }
+
+        public async Task<Result> RecoverUser(int id)
+        {
+            await _ctx.Users
+                .Where(x => x.Id == id)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(x => x.IsDeleted, false));
+
+            return Result.Success();
+        }
+
+        public async Task<Result> BlockUser(int id)
+        {
+            var userInfo = await _ctx.Users
+                .Where(x => x.Id == id)
+                .Select(x => new
+                {
+                    x.IsAdmin
+                })
+                .FirstOrDefaultAsync();
+
+            if (userInfo == null)
+                return SharedErrors.NotFound;
+
+            bool areThereAnyOtherAdmins = !userInfo.IsAdmin
+                ? true
+                : await _ctx.Users.AnyAsync(x =>
+                    x.IsAdmin && !x.IsDeleted && !x.IsBlocked && x.Id != id);
+
+            if (!areThereAnyOtherAdmins)
+                return UserErrors.OperationWouldBlockAccess;
+
+            await _ctx.Users
+                .Where(x => x.Id == id)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(x => x.IsBlocked, true));
+
+            return Result.Success();
+        }
+
+        public async Task<Result> UnblockUser(int id)
+        {
+            await _ctx.Users
+                .Where(x => x.Id == id)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(x => x.IsBlocked, false));
+
+            return Result.Success();
+        }
+
+        public async Task<Result> GrantAdmin(int id)
+        {
+            await _ctx.Users
+                .Where(x => x.Id == id)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(x => x.IsAdmin, true));
+
+            return Result.Success();
+        }
+
+        public async Task<Result> RevokeAdmin(int id)
+        {
+            var userInfo = await _ctx.Users
+               .Where(x => x.Id == id)
+               .Select(x => new
+               {
+                   x.IsAdmin
+               })
+               .FirstOrDefaultAsync();
+
+            if (userInfo == null || !userInfo.IsAdmin)
+                return SharedErrors.NotFound;
+
+            bool areThereAnyOtherAdmins = 
+                await _ctx.Users.AnyAsync(x =>
+                    x.IsAdmin && !x.IsDeleted && !x.IsBlocked && x.Id != id);
+
+            if (!areThereAnyOtherAdmins)
+                return UserErrors.OperationWouldBlockAccess;
+
+            await _ctx.Users
+                .Where(x => x.Id == id)
+                .ExecuteUpdateAsync(setters => setters
+                    .SetProperty(x => x.IsAdmin, false));
+
+            return Result.Success();
+        }
     }
 }

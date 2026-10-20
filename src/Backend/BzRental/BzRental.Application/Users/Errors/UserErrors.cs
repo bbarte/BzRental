@@ -12,5 +12,8 @@ namespace BzRental.Application.Users.Errors
         
         public static readonly Error InvalidCurrentPassword = new Error(
             "Users.InvalidCurrentPassword", "The provided current password is invalid", FailureType.BadRequest);
+        
+        public static readonly Error OperationWouldBlockAccess = new Error(
+            "Users.OperationWouldBlockAccess", "Cannot fullfil request, because it would block the access to the system", FailureType.BadRequest);
     }
 }

@@ -14,5 +14,13 @@ namespace BzRental.Application.Users.Services
         Task<Result> Register(RegisterUserRequest request);
         Task<Result> ChangePassword(ChangeUserPasswordRequest request);
         Task<Result<PaginatedList<UserDto>>> GetUsers(PaginationParameters pagination, string? filter = null, bool includeDeleted = false);
+
+        Task<Result> DeleteUser(int id);
+        Task<Result> RecoverUser(int id);
+        Task<Result> BlockUser(int id);
+        Task<Result> UnblockUser(int id);
+
+        Task<Result> GrantAdmin(int id);
+        Task<Result> RevokeAdmin(int id);
     }
 }
