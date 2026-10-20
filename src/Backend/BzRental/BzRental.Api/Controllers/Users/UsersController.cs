@@ -44,5 +44,47 @@ namespace BzRental.Api.Controllers.Users
         {
             return (await _service.GetUsers(pagination, filter, includeDeleted)).ToActionResult();
         }
+
+        [HttpDelete("{id}"), Authorize(Roles = AuthRoles.Admin)]
+        public async Task<IActionResult> DeleteUser(
+            [FromRoute] int id)
+        {
+            return (await _service.DeleteUser(id)).ToActionResult();
+        }
+        
+        [HttpPost("{id}/recover"), Authorize(Roles = AuthRoles.Admin)]
+        public async Task<IActionResult> RecoverUser(
+            [FromRoute] int id)
+        {
+            return (await _service.RecoverUser(id)).ToActionResult();
+        }
+        
+        [HttpPost("{id}/block"), Authorize(Roles = AuthRoles.Admin)]
+        public async Task<IActionResult> BlockUser(
+            [FromRoute] int id)
+        {
+            return (await _service.BlockUser(id)).ToActionResult();
+        }
+        
+        [HttpPost("{id}/unblock"), Authorize(Roles = AuthRoles.Admin)]
+        public async Task<IActionResult> UnblockUser(
+            [FromRoute] int id)
+        {
+            return (await _service.UnblockUser(id)).ToActionResult();
+        }
+        
+        [HttpPost("{id}/grant-admin"), Authorize(Roles = AuthRoles.Admin)]
+        public async Task<IActionResult> GrantAdmin(
+            [FromRoute] int id)
+        {
+            return (await _service.GrantAdmin(id)).ToActionResult();
+        }
+        
+        [HttpPost("{id}/revoke-admin"), Authorize(Roles = AuthRoles.Admin)]
+        public async Task<IActionResult> RevokeAdmin(
+            [FromRoute] int id)
+        {
+            return (await _service.RevokeAdmin(id)).ToActionResult();
+        }
     }
 }
