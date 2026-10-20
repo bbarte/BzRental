@@ -1,5 +1,7 @@
-﻿using BzRental.Application.Users.Requests;
+﻿using BzRental.Application.Users.Dtos;
+using BzRental.Application.Users.Requests;
 using BzRental.Shared.Contracts.Dtos;
+using BzRental.Shared.Pagination;
 using BzRental.Shared.ResultPattern;
 using System;
 using System.Collections.Generic;
@@ -11,5 +13,6 @@ namespace BzRental.Application.Users.Services
     {
         Task<Result> Register(RegisterUserRequest request);
         Task<Result> ChangePassword(ChangeUserPasswordRequest request);
+        Task<Result<PaginatedList<UserDto>>> GetUsers(PaginationParameters pagination, string? filter = null, bool includeDeleted = false);
     }
 }

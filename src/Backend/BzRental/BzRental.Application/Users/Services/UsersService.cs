@@ -1,10 +1,14 @@
-﻿using BzRental.Application.Users.Errors;
+﻿using BzRental.Application.Users.Dtos;
+using BzRental.Application.Users.Errors;
 using BzRental.Application.Users.Requests;
 using BzRental.DbAccess.Contexts;
+using BzRental.DbAccess.Extensions;
 using BzRental.Domain.Users.Models;
 using BzRental.Shared.Abstraction;
+using BzRental.Shared.Contracts.Dtos;
 using BzRental.Shared.Errors;
 using BzRental.Shared.Extensions;
+using BzRental.Shared.Pagination;
 using BzRental.Shared.ResultPattern;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -91,6 +95,44 @@ namespace BzRental.Application.Users.Services
                     .SetProperty(x => x.PasswordHash, hash));
 
             return Result.Success();
+        }
+
+        public async Task<Result<PaginatedList<UserDto>>> GetUsers(
+            PaginationParameters pagination,
+            string? filter = null,
+            bool includeDeleted = false)
+        {
+            IQueryable<User> query = _ctx.Users;
+
+            if (!includeDeleted)
+                query = query.Where(x => !x.IsDeleted);
+
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                foreach (string keyword in filter.Split(' ').Take(10))
+                {
+                    query = query.Where(x =>
+                        x.Username.Contains(filter) ||
+                        x.FirstName.Contains(filter) ||
+                        x.LastName.Contains(filter));
+                }
+            }
+
+            IQueryable<UserDto> dtoQuery = query
+                .Select(x => new UserDto
+                {
+                    Id = x.Id,
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
+                    Username = x.Username,
+                    IsAdmin = x.IsAdmin,
+                    IsDeleted = x.IsDeleted,
+                    IsBlocked = x.IsBlocked,
+
+                    CreatedAt = x.CreatedAt
+                });
+
+            return await dtoQuery.ToPaginatedListAsync(pagination);
         }
     }
 }
