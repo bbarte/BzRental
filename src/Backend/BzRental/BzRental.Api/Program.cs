@@ -1,4 +1,3 @@
-
 namespace BzRental.Api
 {
     public class Program
