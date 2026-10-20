@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/DAL/">
+    <Project Path="BzRental.Application/BzRental.Application.csproj" />
+    <Project Path="BzRental.Configuration/BzRental.Configuration.csproj" />
+    <Project Path="BzRental.Domain/BzRental.Domain.csproj" />
+  </Folder>
+  <Project Path="BzRental.Api/BzRental.Api.csproj" />
+  <Project Path="BzRental.DbAccess/BzRental.DbAccess.csproj" />
+  <Project Path="BzRental.Shared/BzRental.Shared.csproj" />
+</Solution>
