@@ -21,6 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BzRental.Configuration\BzRental.Configuration.csproj" />
+    <ProjectReference Include="..\BzRental.Domain\BzRental.Domain.csproj" />
     <ProjectReference Include="..\BzRental.Shared\BzRental.Shared.csproj" />
   </ItemGroup>
 
