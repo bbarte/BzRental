@@ -1,6 +1,9 @@
+using BzRental.Api.Abstraction;
 using BzRental.Api.Handlers;
 using BzRental.DbAccess.Contexts;
+using BzRental.Shared.Abstraction;
 using LinqKit;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
@@ -28,6 +31,9 @@ namespace BzRental.Api
 
             builder.Services.AddHttpContextAccessor();
 
+            builder.Services.AddScoped<IPasswordHasher<object>, PasswordHasher<object>>();
+            builder.Services.AddScoped<ISharedPasswordHasher, AspnetPasswordHasher>();
+
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
@@ -38,6 +44,15 @@ namespace BzRental.Api
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
+
+                app.UseReDoc(opt =>
+                {
+                    opt.SpecUrl("/openapi/v1.json");
+                    opt.DocumentTitle = "BzRental API (C) Bartosz Zagalski";
+
+                    opt.NativeScrollbars();
+                    opt.PathInMiddlePanel();
+                });
             }
 
             app.UseHttpsRedirection();
