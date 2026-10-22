@@ -9,7 +9,7 @@ export function ErrorMessagesList({errors, className}: ErrorMessagesListProps) {
 
     return (
         <>
-            <div className={`bg-danger-subtle bg-gradient border border-danger p-3 rounded shadow-sm fade-in ${className}`}>
+            <div className={`bg-danger-subtle bg-gradient border border-danger p-3 rounded shadow-sm slide-in ${className}`}>
                 <div className="container">
                     <ul className="m-0 ps-3">
                         {
