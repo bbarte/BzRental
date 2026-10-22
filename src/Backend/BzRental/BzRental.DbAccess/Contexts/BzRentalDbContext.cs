@@ -1,4 +1,5 @@
-﻿using BzRental.Shared.Models;
+﻿using BzRental.Configuration.Users;
+using BzRental.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
@@ -7,7 +8,7 @@ using System.Text;
 
 namespace BzRental.DbAccess.Contexts
 {
-    public sealed class BzRentalDbContext : DbContext
+    public sealed partial class BzRentalDbContext : DbContext
     {
         public BzRentalDbContext(DbContextOptions options)
             : base(options)
@@ -16,6 +17,9 @@ namespace BzRental.DbAccess.Contexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder
+                .ConfigureUsers();
+
             base.OnModelCreating(modelBuilder);
         }
 

@@ -1,8 +1,10 @@
 using BzRental.Api.Abstraction;
 using BzRental.Api.Auth;
 using BzRental.Api.Handlers;
+using BzRental.Application.Users;
 using BzRental.Application.Users.Services;
 using BzRental.DbAccess.Contexts;
+using BzRental.DbAccess.Seeding;
 using BzRental.Shared.Abstraction;
 using LinqKit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -16,7 +18,7 @@ namespace BzRental.Api
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +42,11 @@ namespace BzRental.Api
             builder.Services.AddScoped<ISharedPasswordHasher, AspnetPasswordHasher>();
             builder.Services.AddScoped<IUserProvider, JwtUserProvider>();
             builder.Services.AddScoped<ITokenCreationService, TokenCreationService>();
+
+            builder.Services.AddScoped<BzRentalDbContextSeeder>();
+
+            builder.Services
+                .AddUserServices();
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
@@ -77,6 +84,14 @@ namespace BzRental.Api
                     opt.NativeScrollbars();
                     opt.PathInMiddlePanel();
                 });
+            }
+
+            using (IServiceScope scope = app.Services.CreateScope())
+            {
+                IServiceProvider services = scope.ServiceProvider;
+
+                BzRentalDbContextSeeder seeder = services.GetRequiredService<BzRentalDbContextSeeder>();
+                await seeder.Seed();
             }
 
             app.UseHttpsRedirection();
