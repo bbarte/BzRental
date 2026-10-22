@@ -5,8 +5,15 @@ import type ILoggedUserDto from "../Dtos/ILoggedUserDto";
 import type ILoginRequest from "../Requests/ILoginRequest";
 
 export default class AuthService {
-    public static isLoggedIn: boolean = false;
-    public static isUserAdmin: boolean = false;
+    private static readonly IS_ADMIN_KEY = 'isAdmin';
+
+    public static get isUserAdmin(): boolean {
+        return localStorage.getItem(this.IS_ADMIN_KEY) !== null;
+    }
+
+    public static get isLoggedIn(): boolean {
+        return JwtManager.getAccessToken() !== null;
+    }
 
     public static loggedUserInfo: ILoggedUserDto = {
         firstName: '',
@@ -19,15 +26,16 @@ export default class AuthService {
 
         JwtManager.setAccessToken(data.accessToken);
 
-        this.isLoggedIn = true;
-        this.isUserAdmin = data.isAdmin;
+        if (data.isAdmin)
+            localStorage.setItem(this.IS_ADMIN_KEY, '1');
+        else
+            localStorage.removeItem(this.IS_ADMIN_KEY);
 
         await this.setLoggedUserInfo();
     }
 
     public static async getUserInfo(): Promise<ILoggedUserDto> {
         const {data} = await ApiClient.instance.http.get<ILoggedUserDto>('auth/info');
-
         return data;
     }
 
@@ -43,7 +51,6 @@ export default class AuthService {
         };
 
         JwtManager.removeAccessToken();
-        this.isLoggedIn = false;
-        this.isUserAdmin = false;
+        localStorage.removeItem(this.IS_ADMIN_KEY);
     }
 }
