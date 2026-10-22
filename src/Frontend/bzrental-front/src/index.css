@@ -15,3 +15,8 @@
         transform: scaleY(1);
     }
 }
+
+.loader-host {
+    position: relative;
+    overflow: hidden;
+}
