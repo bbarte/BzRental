@@ -3,6 +3,7 @@ import { JwtManager } from "./JwtManager";
 import type IApiErrorResponseDto from "./Models/IApiErrorResponseDto";
 import { ApiError } from "./ApiError";
 import type IApiErrorDto from "./Models/IApiErrorDto";
+import AuthService from "../Auth/Services/AuthService";
 
 export class ApiClient {
     readonly API_URL: string = 'https://localhost:7194/api/';
@@ -54,7 +55,7 @@ export class ApiClient {
                     : [{code: `Http.${status}`, message: error.message}];
                     
                 if (status === 401) {
-                    JwtManager.removeAccessToken();
+                    AuthService.logout();
                 }
 
                 return Promise.reject(new ApiError(status, errors));
