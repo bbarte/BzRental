@@ -1,0 +1,17 @@
+.fade-in {
+    animation-name: animFadeIn;
+    animation-duration: 0.5s;
+    animation-iteration-count: 1;
+    transform-origin: top center;
+}
+
+@keyframes animFadeIn {
+    from {
+        opacity: 0;
+        transform: scaleY(0.7);
+    }
+    to {
+        opacity: 1;
+        transform: scaleY(1);
+    }
+}
