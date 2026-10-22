@@ -1,5 +1,6 @@
 import { Link, NavLink } from "react-router-dom";
 import logo from '../../assets/bzrental_logo.png';
+import AuthService from "../../DAL/Auth/Services/AuthService";
 
 export default function BzRentalNavbar() {
     return (
@@ -22,6 +23,14 @@ export default function BzRentalNavbar() {
                                 </NavLink>
                             </li>
                         </ul>
+
+                        <div className="ms-auto">
+                            {
+                                !AuthService.isLoggedIn ?
+                                <Link to='/login'>Zaloguj się</Link> :
+                                <p>Zalogowano</p>
+                            }
+                        </div>
                     </div>
                 </div>
             </div>
