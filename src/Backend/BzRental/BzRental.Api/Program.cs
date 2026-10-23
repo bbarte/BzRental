@@ -69,6 +69,18 @@ namespace BzRental.Api
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("Frontend", policy =>
+                {
+                    policy
+                        .WithOrigins(builder.Configuration["FrontendUrl"]!)
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                });
+            });
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -95,6 +107,8 @@ namespace BzRental.Api
             }
 
             app.UseHttpsRedirection();
+
+            app.UseCors("Frontend");
 
             app.UseAuthentication();
             app.UseAuthorization();
