@@ -112,9 +112,9 @@ namespace BzRental.Application.Users.Services
                 foreach (string keyword in filter.Split(' ').Take(10))
                 {
                     query = query.Where(x =>
-                        x.Username.Contains(filter) ||
-                        x.FirstName.Contains(filter) ||
-                        x.LastName.Contains(filter));
+                        x.Username.Contains(keyword) ||
+                        x.FirstName.Contains(keyword) ||
+                        x.LastName.Contains(keyword));
                 }
             }
 
