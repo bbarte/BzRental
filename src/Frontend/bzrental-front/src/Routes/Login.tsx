@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from 'react-hook-form';
 import { ErrorMessagesList } from "../Components/ErrorMessagesList";
 import BzRentalFooter from "../Components/Layout/BzRentalFooter";
@@ -7,13 +7,28 @@ import type ILoginRequest from "../DAL/Auth/Requests/ILoginRequest";
 import { ApiError } from "../DAL/ApiAccess/ApiError";
 import AuthService from "../DAL/Auth/Services/AuthService";
 import { BzRentalNavbar } from "../Components/Layout/BzRentalNavbar";
-import { useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { InfoMessagesList } from "../Components/InfoMessagesList";
 
 export default function Login() {
     const [isUserLoggedIn, setIsUserLoggedIn] = useState<boolean>(AuthService.isLoggedIn);
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [loginErrors, setLoginErrors] = useState<string[]>([]);
+
+    const [infoMessages, setInfoMessages] = useState<string[]>([]);
+
+    const location = useLocation();
+
+    useEffect(() => {
+        const state = location.state as {
+            infoMessages?: string[];
+        } | null;
+
+        if (state?.infoMessages)
+            setInfoMessages(state.infoMessages);
+        
+    }, [location.state])
 
     const navigate = useNavigate();
 
@@ -74,6 +89,7 @@ export default function Login() {
                     <div className="col-lg-3"></div>
                     <div className="col-lg-6">
                         <ErrorMessagesList className="mb-4" errors={loginErrors}/>
+                        <InfoMessagesList className="mb-4" messages={infoMessages}/>
                     </div>
                     <div className="col-lg-3"></div>
                 </div>
@@ -105,7 +121,7 @@ export default function Login() {
                                                 )}
                                             </div>
                                         </div>
-                                        <div className="row">
+                                        <div className="row mb-4">
                                             <label htmlFor="password" className="col-sm-2 col-form-label">Hasło:</label>
                                             <div className="col-sm-10">
                                                 <input
@@ -121,6 +137,11 @@ export default function Login() {
                                                         {errors.password.message}
                                                     </div>
                                                 )}
+                                            </div>
+                                        </div>
+                                        <div className="row">
+                                            <div className="col-12">
+                                                Nie posiadasz konta? <Link to='/register'>Zarejestruj się</Link>
                                             </div>
                                         </div>
                                     </form>
