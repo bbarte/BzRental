@@ -46,6 +46,19 @@ export function BzRentalNavbar({isUserLoggedIn, handleLogout}: BzRentalNavbarPro
                                     Strona główna
                                 </NavLink>
                             </li>
+                            {
+                                (isUserLoggedIn && AuthService.isUserAdmin) &&
+                                <li className="nav-item dropdown">
+                                    <a className="nav-link dropdown-toggle" data-bs-toggle="dropdown" style={{cursor: 'pointer'}}>
+                                        Administrator
+                                    </a>
+                                    <ul className="dropdown-menu shadow">
+                                        <li>
+                                            <NavLink to='/admin/users' className='dropdown-item'>Użytkownicy</NavLink>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
                         </ul>
 
                         <div className="ms-auto">
