@@ -5,10 +5,11 @@ import type IPaginationParameters from "../DAL/Shared/Models/IPaginationParamete
 export type PaginatorProps = {
     parameters: IPaginationParameters,
     list: IPaginatedList<any>,
-    setParameters: React.Dispatch<React.SetStateAction<IPaginationParameters>>
+    setParameters: React.Dispatch<React.SetStateAction<IPaginationParameters>>,
+    className?: string | null
 };
 
-export function Paginator({parameters, list, setParameters}: PaginatorProps) {
+export function Paginator({parameters, list, setParameters, className}: PaginatorProps) {
     function handleGoToFirstPage() {
         if (parameters.pageNumber === 1)
             return;
@@ -40,12 +41,12 @@ export function Paginator({parameters, list, setParameters}: PaginatorProps) {
     }
 
     return (
-        <div className="d-flex align-items-center gap-2">
-          <ul className="pagination">
+        <div className={`d-flex align-items-center flex-wrap gap-3 ${className}`}>
+          <ul className="pagination m-0">
             <li className="page-item">
                 <a style={{cursor: 'pointer'}} className="page-link" onClick={handleGoToFirstPage}>
                     <i className="fa fa-step-backward"></i>
-                    <span className="ms-2">Pierwsza strona</span>
+                    {/* <span className="ms-2">Pierwsza</span> */}
                 </a>
             </li>
             <li className="page-item">
@@ -62,7 +63,7 @@ export function Paginator({parameters, list, setParameters}: PaginatorProps) {
             </li>
           </ul>
           <div>
-            strona {parameters.pageNumber}
+            strona&nbsp;{parameters.pageNumber}
           </div>
         </div>
     )
