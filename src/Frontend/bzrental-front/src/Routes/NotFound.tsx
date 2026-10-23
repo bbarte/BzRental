@@ -1,11 +1,15 @@
 import { Link } from "react-router-dom";
 import BzRentalFooter from "../Components/Layout/BzRentalFooter";
-import BzRentalNavbar from "../Components/Layout/BzRentalNavbar";
+import { BzRentalNavbar } from "../Components/Layout/BzRentalNavbar";
+import { useState } from "react";
+import AuthService from "../DAL/Auth/Services/AuthService";
 
 export default function NotFound() {
+    const [isUserLoggedIn] = useState<boolean>(AuthService.isLoggedIn);
+    
     return (
         <>
-            <BzRentalNavbar/>
+            <BzRentalNavbar isUserLoggedIn={isUserLoggedIn}/>
 
             <div className="container">
                 <div className="w-50 mx-auto bg-warning-subtle p-4 my-5 rounded border border-warning shadow-sm">

@@ -1,8 +1,29 @@
 import { Link, NavLink } from "react-router-dom";
 import logo from '../../assets/bzrental_logo.png';
+import { useEffect, useState } from "react";
+import type ILoggedUserDto from "../../DAL/Auth/Dtos/ILoggedUserDto";
 import AuthService from "../../DAL/Auth/Services/AuthService";
 
-export default function BzRentalNavbar() {
+export type BzRentalNavbarProps = {
+    isUserLoggedIn: boolean
+};
+
+export function BzRentalNavbar({isUserLoggedIn}: BzRentalNavbarProps) {
+    const [loggedUserInfo, setLoggedUserInfo] = useState<ILoggedUserDto>({
+        username: '',
+        firstName: '',
+        lastName: ''
+    });
+
+    useEffect(() => {
+        if (isUserLoggedIn) {
+            AuthService.getUserInfo()
+                .then((data: ILoggedUserDto) => {
+                    setLoggedUserInfo(data);
+                });
+        }
+    }, [isUserLoggedIn]);
+
     return (
         <>
             <div className="navbar navbar-expand-lg bg-light border-bottom mb-4 sticky-top">
@@ -26,9 +47,11 @@ export default function BzRentalNavbar() {
 
                         <div className="ms-auto">
                             {
-                                !AuthService.isLoggedIn ?
+                                !isUserLoggedIn ?
                                 <Link to='/login'>Zaloguj się</Link> :
-                                <p>Zalogowano</p>
+                                <p>
+                                    {loggedUserInfo.firstName} {loggedUserInfo.lastName} ({loggedUserInfo.username})
+                                </p>
                             }
                         </div>
                     </div>

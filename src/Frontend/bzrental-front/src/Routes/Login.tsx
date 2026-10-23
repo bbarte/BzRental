@@ -2,15 +2,20 @@ import { useState } from "react";
 import { useForm } from 'react-hook-form';
 import { ErrorMessagesList } from "../Components/ErrorMessagesList";
 import BzRentalFooter from "../Components/Layout/BzRentalFooter";
-import BzRentalNavbar from "../Components/Layout/BzRentalNavbar";
 import Loader from "../Components/Loader";
 import type ILoginRequest from "../DAL/Auth/Requests/ILoginRequest";
 import { ApiError } from "../DAL/ApiAccess/ApiError";
 import AuthService from "../DAL/Auth/Services/AuthService";
+import { BzRentalNavbar } from "../Components/Layout/BzRentalNavbar";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
+    const [isUserLoggedIn, setIsUserLoggedIn] = useState<boolean>(AuthService.isLoggedIn);
+
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [loginErrors, setLoginErrors] = useState<string[]>([]);
+
+    const navigate = useNavigate();
 
     const {
         register,
@@ -44,14 +49,16 @@ export default function Login() {
             setIsLoading(false);
         }
 
-        alert('Zalogowano!');
+        setIsUserLoggedIn(true);
+
+        navigate('/');
     }
 
     return (
         <>
-            <BzRentalNavbar/>
+            <BzRentalNavbar isUserLoggedIn={isUserLoggedIn}/>
 
-            <div className="container r">
+            <div className="container">
                 <div className="row">
                     <div className="col-lg-3"></div>
                     <div className="col-lg-6">
