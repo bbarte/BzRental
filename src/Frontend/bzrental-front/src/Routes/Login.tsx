@@ -28,6 +28,10 @@ export default function Login() {
         }
     });
 
+    async function handleLogout(): Promise<void> {
+        setIsUserLoggedIn(false);
+    }
+
     async function onSubmit(data: ILoginRequest) {
         setIsLoading(true);
 
@@ -36,11 +40,16 @@ export default function Login() {
         }
         catch (e) {
             if (e instanceof ApiError) {
-                if (e.hasCode('Auth.LoginFailed')) {
-                    setLoginErrors(['Podane dane logowania są nieprawidłowe']);
-                } else if (e.hasCode('Auth.Blocked')) {
-                    setLoginErrors(['Użytkownik został zablokowany.']);
-                }
+                setLoginErrors(e.getTranslations([
+                    {
+                        code: 'Auth.LoginFailed',
+                        msg: 'Podane dane logowania są nieprawidłowe'
+                    },
+                    {
+                        code: 'Auth.Blocked',
+                        msg: 'Użytkownik został zablokowany.'
+                    }
+                ]));
 
                 return;
             }
@@ -56,7 +65,9 @@ export default function Login() {
 
     return (
         <>
-            <BzRentalNavbar isUserLoggedIn={isUserLoggedIn}/>
+            <BzRentalNavbar
+                isUserLoggedIn={isUserLoggedIn}
+                handleLogout={handleLogout}/>
 
             <div className="container">
                 <div className="row">

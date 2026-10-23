@@ -3,17 +3,15 @@ import logo from '../../assets/bzrental_logo.png';
 import { useEffect, useState } from "react";
 import type ILoggedUserDto from "../../DAL/Auth/Dtos/ILoggedUserDto";
 import AuthService from "../../DAL/Auth/Services/AuthService";
+import { NavbarUserAvatar } from "./NavbarUserAvatar";
 
 export type BzRentalNavbarProps = {
-    isUserLoggedIn: boolean
+    isUserLoggedIn: boolean,
+    handleLogout: () => Promise<void>
 };
 
-export function BzRentalNavbar({isUserLoggedIn}: BzRentalNavbarProps) {
-    const [loggedUserInfo, setLoggedUserInfo] = useState<ILoggedUserDto>({
-        username: '',
-        firstName: '',
-        lastName: ''
-    });
+export function BzRentalNavbar({isUserLoggedIn, handleLogout}: BzRentalNavbarProps) {
+    const [loggedUserInfo, setLoggedUserInfo] = useState<ILoggedUserDto | null>(null);
 
     useEffect(() => {
         if (isUserLoggedIn) {
@@ -23,6 +21,11 @@ export function BzRentalNavbar({isUserLoggedIn}: BzRentalNavbarProps) {
                 });
         }
     }, [isUserLoggedIn]);
+
+    async function handleAvatarLogout(): Promise<void> {
+        await AuthService.logout();
+        handleLogout();
+    }
 
     return (
         <>
@@ -48,10 +51,13 @@ export function BzRentalNavbar({isUserLoggedIn}: BzRentalNavbarProps) {
                         <div className="ms-auto">
                             {
                                 !isUserLoggedIn ?
-                                <Link to='/login'>Zaloguj się</Link> :
-                                <p>
-                                    {loggedUserInfo.firstName} {loggedUserInfo.lastName} ({loggedUserInfo.username})
-                                </p>
+                                <Link to='/login' className="btn btn-outline-secondary">
+                                    <div className="fa fa-sign-in"></div>
+                                    <span className="ms-2">Zaloguj się</span>
+                                </Link> :
+                                <NavbarUserAvatar
+                                    userInfo={loggedUserInfo}
+                                    handleLogout={handleAvatarLogout}/>
                             }
                         </div>
                     </div>

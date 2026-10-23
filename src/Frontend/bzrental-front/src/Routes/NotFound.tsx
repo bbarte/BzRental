@@ -5,11 +5,17 @@ import { useState } from "react";
 import AuthService from "../DAL/Auth/Services/AuthService";
 
 export default function NotFound() {
-    const [isUserLoggedIn] = useState<boolean>(AuthService.isLoggedIn);
+    const [isUserLoggedIn, setIsUserLoggedIn] = useState<boolean>(AuthService.isLoggedIn);
     
+    async function handleLogout(): Promise<void> {
+        setIsUserLoggedIn(false);
+    }
+
     return (
         <>
-            <BzRentalNavbar isUserLoggedIn={isUserLoggedIn}/>
+            <BzRentalNavbar
+                isUserLoggedIn={isUserLoggedIn}
+                handleLogout={handleLogout}/>
 
             <div className="container">
                 <div className="w-50 mx-auto bg-warning-subtle p-4 my-5 rounded border border-warning shadow-sm">
