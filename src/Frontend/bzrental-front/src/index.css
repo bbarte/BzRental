@@ -33,5 +33,11 @@
 
 .loader-host {
     position: relative;
-    overflow: hidden;
+    /* overflow: hidden; */
+}
+
+.table td.fit,
+.table th.fit {
+    white-space: nowrap;
+    width: 1%;
 }
