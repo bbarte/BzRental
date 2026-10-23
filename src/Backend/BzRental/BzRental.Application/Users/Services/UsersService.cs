@@ -130,7 +130,8 @@ namespace BzRental.Application.Users.Services
                     IsBlocked = x.IsBlocked,
 
                     CreatedAt = x.CreatedAt
-                });
+                })
+                .OrderBy(x => x.Id);
 
             return await dtoQuery.ToPaginatedListAsync(pagination);
         }
