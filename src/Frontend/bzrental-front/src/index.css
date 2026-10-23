@@ -1,0 +1,43 @@
+.slide-in {
+    animation-name: animSlideIn;
+    animation-duration: 0.5s;
+    animation-iteration-count: 1;
+    transform-origin: top center;
+}
+
+@keyframes animSlideIn {
+    from {
+        opacity: 0;
+        transform: scaleY(0.7);
+    }
+    to {
+        opacity: 1;
+        transform: scaleY(1);
+    }
+}
+
+.fade-in {
+    animation-name: animFadeIn;
+    animation-duration: 0.5s;
+    animation-iteration-count: 1;
+}
+
+@keyframes animFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.loader-host {
+    position: relative;
+    /* overflow: hidden; */
+}
+
+.table td.fit,
+.table th.fit {
+    white-space: nowrap;
+    width: 1%;
+}
