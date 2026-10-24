@@ -1,4 +1,5 @@
-﻿using BzRental.Configuration.Users;
+﻿using BzRental.Configuration.Products;
+using BzRental.Configuration.Users;
 using BzRental.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -18,7 +19,8 @@ namespace BzRental.DbAccess.Contexts
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .ConfigureUsers();
+                .ConfigureUsers()
+                .ConfigureProducts();
 
             base.OnModelCreating(modelBuilder);
         }
