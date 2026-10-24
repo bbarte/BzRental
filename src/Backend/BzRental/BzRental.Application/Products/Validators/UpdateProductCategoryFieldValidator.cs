@@ -15,7 +15,6 @@ namespace BzRental.Application.Products.Validators
                 .MaximumLength(255);
 
             RuleFor(x => x.UnitName)
-                .NotEmpty()
                 .MaximumLength(50);
         }
     }
