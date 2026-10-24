@@ -5,7 +5,7 @@ export type ModalProps = {
     isOpened: boolean,
     setIsOpened: React.Dispatch<React.SetStateAction<boolean>>
     children: ReactNode,
-    footerChildren: ReactNode
+    footerChildren?: ReactNode | null
 };
 
 export function Modal({title, setIsOpened, isOpened, children, footerChildren}: ModalProps) {
@@ -31,9 +31,12 @@ export function Modal({title, setIsOpened, isOpened, children, footerChildren}: 
                         <div className="modal-body">
                             {children}
                         </div>
-                        <div className="modal-footer">
-                            {footerChildren}
-                        </div>
+                        {
+                            footerChildren != null &&
+                            <div className="modal-footer">
+                                {footerChildren}
+                            </div>
+                        }
                     </div>
                 </div>
 
