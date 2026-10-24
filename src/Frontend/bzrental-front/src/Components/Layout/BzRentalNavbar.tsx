@@ -29,7 +29,7 @@ export function BzRentalNavbar({isUserLoggedIn, handleLogout}: BzRentalNavbarPro
 
     return (
         <>
-            <div className="navbar navbar-expand-lg bg-light border-bottom mb-4 sticky-top">
+            <div className="navbar shadow-sm navbar-expand-lg bg-light border-bottom mb-4 sticky-top">
                 <div className="container">
                     <Link to='/' className="navbar-brand">
                         <img src={logo} alt="" height="35"/>
@@ -55,6 +55,12 @@ export function BzRentalNavbar({isUserLoggedIn, handleLogout}: BzRentalNavbarPro
                                     <ul className="dropdown-menu shadow">
                                         <li>
                                             <NavLink to='/admin/users' className='dropdown-item'>Użytkownicy</NavLink>
+                                        </li>
+                                        <li>
+                                            <hr className="dropdown-divider" />
+                                        </li>
+                                        <li>
+                                            <NavLink to='/admin/product-categories' className='dropdown-item'>Kategorie przedmiotów</NavLink>
                                         </li>
                                     </ul>
                                 </li>
