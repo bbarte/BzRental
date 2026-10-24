@@ -10,7 +10,7 @@ namespace BzRental.Application.Products.Services
     public interface IProductCategoriesService
     {
         Task<Result<CreatedObjectDto<int>>> AddProductCategory(AddProductCategoryRequest request);
-        Task<Result<CreatedObjectDto<int>>> AddProductCategoryField(int productId, AddProductCategoryFieldRequest request);
+        Task<Result<CreatedObjectDto<int>>> AddProductCategoryField(int categoryId, AddProductCategoryFieldRequest request);
 
         Task<Result> UpdateProductCategory(int id, UpdateProductCategoryRequest request);
         Task<Result> UpdateProductCategoryField(int id, UpdateProductCategoryFieldRequest request);
