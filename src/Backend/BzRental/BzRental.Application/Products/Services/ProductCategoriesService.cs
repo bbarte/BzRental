@@ -1,9 +1,12 @@
-﻿using BzRental.Application.Products.Requests;
+﻿using BzRental.Application.Products.Dtos;
+using BzRental.Application.Products.Requests;
 using BzRental.DbAccess.Contexts;
+using BzRental.DbAccess.Extensions;
 using BzRental.Domain.Products.Models;
 using BzRental.Shared.Contracts.Dtos;
 using BzRental.Shared.Errors;
 using BzRental.Shared.Extensions;
+using BzRental.Shared.Pagination;
 using BzRental.Shared.ResultPattern;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -33,6 +36,116 @@ namespace BzRental.Application.Products.Services
             _updateCatValidator = updateCatValidator;
             _addCatFieldValidator = addCatFieldValidator;
             _updateCatFieldValidator = updateCatFieldValidator;
+        }
+
+        public async Task<Result<PaginatedList<ProductCategoryDto>>> GetProductCategories(
+            PaginationParameters pagination,
+            string? filter = null,
+            bool includeDeleted = false)
+        {
+            IQueryable<ProductCategory> query = _ctx.ProductCategories;
+
+            if (!includeDeleted)
+                query = query.Where(x => !x.IsDeleted);
+
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                foreach (string keyword in filter.Split(' ').Take(10))
+                {
+                    query = query.Where(x => x.Name.Contains(keyword));
+                }
+            }
+
+            IQueryable<ProductCategoryDto> dtoQuery = query
+                .Select(x => new ProductCategoryDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    CreatedAt = x.CreatedAt,
+                    IsDeleted = x.IsDeleted
+                })
+                .OrderBy(x => x.Id);
+
+            return await dtoQuery.ToPaginatedListAsync(pagination);
+        }
+
+        public async Task<Result<ProductCategoryDto>> GetProductCategoryById(int id)
+        {
+            ProductCategoryDto? dto = await _ctx.ProductCategories
+                .Where(x => x.Id == id && !x.IsDeleted)
+                .Select(x => new ProductCategoryDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    CreatedAt = x.CreatedAt,
+                    IsDeleted = x.IsDeleted
+                })
+                .FirstOrDefaultAsync();
+
+            if (dto == null)
+                return SharedErrors.NotFound;
+
+            return dto;
+        }
+
+        public async Task<Result<PaginatedList<ProductCategoryFieldDto>>> GetProductCategoryFields(
+            int categoryId,
+            PaginationParameters pagination,
+            string? filter,
+            bool includeDeleted = false)
+        {
+            IQueryable<ProductsCategoryField> query = _ctx.ProductsCategoryFields
+                .Where(x => x.CategoryId == categoryId);
+
+            if (!includeDeleted)
+                query = query.Where(x => !x.IsDeleted);
+
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                foreach (string keyword in filter.Split(' ').Take(10))
+                {
+                    query = query.Where(x => x.Name.Contains(keyword));
+                }
+            }
+
+            IQueryable<ProductCategoryFieldDto> dtoQuery = query
+                .Select(x => new ProductCategoryFieldDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Type = x.Type,
+                    MinValue = x.MinValue,
+                    MaxValue = x.MaxValue,
+                    UnitName = x.UnitName,
+                    IsDeleted = x.IsDeleted,
+                    CreatedAt = x.CreatedAt
+                })
+                .OrderBy(x => x.Id);
+
+            return await dtoQuery.ToPaginatedListAsync(pagination);
+        }
+
+        public async Task<Result<ProductCategoryFieldDto>> GetProductCategoryFieldById(int id)
+        {
+            ProductCategoryFieldDto? dto = await _ctx.ProductsCategoryFields
+                .Where(x => x.Id == id && !x.IsDeleted)
+                .Select(x => new ProductCategoryFieldDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Type = x.Type,
+                    MinValue = x.MinValue,
+                    MaxValue = x.MaxValue,
+                    UnitName = x.UnitName,
+                    IsDeleted = x.IsDeleted,
+                    CreatedAt = x.CreatedAt
+                })
+                .FirstOrDefaultAsync();
+
+            if (dto == null)
+                return SharedErrors.NotFound;
+
+            return dto;
         }
 
         public async Task<Result<CreatedObjectDto<int>>> AddProductCategory(AddProductCategoryRequest request)
