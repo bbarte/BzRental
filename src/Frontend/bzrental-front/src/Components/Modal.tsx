@@ -5,10 +5,11 @@ export type ModalProps = {
     isOpened: boolean,
     setIsOpened: React.Dispatch<React.SetStateAction<boolean>>
     children: ReactNode,
-    footerChildren?: ReactNode | null
+    footerChildren?: ReactNode | null,
+    className?: string | null
 };
 
-export function Modal({title, setIsOpened, isOpened, children, footerChildren}: ModalProps) {
+export function Modal({title, setIsOpened, isOpened, children, footerChildren, className}: ModalProps) {
     if (!isOpened)
         return null;
 
@@ -22,8 +23,8 @@ export function Modal({title, setIsOpened, isOpened, children, footerChildren}: 
                 role="dialog"
             >
 
-                <div className="modal-dialog modal-dialog-centered modal-dialog scrollable">
-                    <div className="modal-content">
+                <div className={`modal-dialog modal-dialog-centered modal-dialog-scrollable ${className}`}>
+                    <div className="modal-content shadow slide-in">
                         <div className="modal-header">
                             <h5 className="modal-title">{title}</h5>
                             <button className="btn-close" onClick={() => setIsOpened(false)}></button>
