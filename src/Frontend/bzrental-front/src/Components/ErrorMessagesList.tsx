@@ -11,13 +11,20 @@ export function ErrorMessagesList({errors, className}: ErrorMessagesListProps) {
         <>
             <div className={`bg-danger-subtle bg-gradient border border-danger p-3 rounded shadow-sm slide-in ${className}`}>
                 <div className="container">
-                    <ul className="m-0 ps-3">
-                        {
-                            errors.map((item, idx) => (
-                                <li key={idx}>{item}</li>
-                            ))
-                        }
-                    </ul>
+                    {
+                        errors.length === 1 &&
+                        errors[0]
+                    }
+                    {
+                        errors.length > 1 &&
+                        <ul className="m-0 ps-3">
+                            {
+                                errors.map((item, idx) => (
+                                    <li key={idx}>{item}</li>
+                                ))
+                            }
+                        </ul>
+                    }
                 </div>
             </div>
         </>
