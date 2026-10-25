@@ -57,8 +57,8 @@ export function Paginator({parameters, list, setParameters, className}: Paginato
             </li>
             <li className="page-item">
                 <a style={{cursor: 'pointer'}} className={`page-link ${list.hasNextPage ? '' : 'disabled'}`} onClick={handleGoToNextPage}>
+                    <span className="me-2">Następna</span>
                     <i className="fa fa-arrow-right"></i>
-                    <span className="ms-2">Następna</span>
                 </a>
             </li>
           </ul>
