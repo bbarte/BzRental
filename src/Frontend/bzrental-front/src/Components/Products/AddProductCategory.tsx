@@ -21,9 +21,6 @@ export function AddProductCategory({handleSave, setIsOpened}: AddProductCategory
     const [catFields, setCatFields] = useState<IAddProductCategoryFieldRequest[]>([]);
 
     function handleBtnAddFieldClick() {
-        if (catFields.length > 0 && catFields[catFields.length - 1].name.trim() === '')
-            return;
-
         setCatFields((prev) => [
             ...prev,
             {
