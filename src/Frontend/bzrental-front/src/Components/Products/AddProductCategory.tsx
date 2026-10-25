@@ -75,7 +75,7 @@ export function AddProductCategory({handleSave, setIsOpened}: AddProductCategory
                     <label htmlFor="name" className="col-sm-3 col-form-label">Nazwa:</label>
                     <div className="col-sm-9">
                         <input
-                            type="text" name="name" id="name" className="form-control"
+                            type="text" name="name" id="name" className="form-control" maxLength={255}
                             value={catName} onChange={(e) => setCatName(e.target.value)}/>
                     </div>
                 </div>
