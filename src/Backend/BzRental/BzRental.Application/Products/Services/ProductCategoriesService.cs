@@ -223,8 +223,8 @@ namespace BzRental.Application.Products.Services
 
             field.Name = request.Name;
             field.MinValue = request.MinValue;
-            request.MaxValue = request.MaxValue;
-            request.UnitName = request.UnitName;
+            field.MaxValue = request.MaxValue;
+            field.UnitName = request.UnitName;
 
             await _ctx.SaveChangesAsync();
 

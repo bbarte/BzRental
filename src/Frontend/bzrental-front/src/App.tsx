@@ -6,6 +6,7 @@ import Login from './Routes/Login'
 import Register from './Routes/Register'
 import ProtectedAdminRoute from './Routes/ProtectedAdminRoute'
 import Users from './Routes/Admin/Users'
+import ProductCategories from './Routes/Admin/ProductCategories'
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
 
         <Route element={<ProtectedAdminRoute/>}>
           <Route path='/admin/users' element={<Users/>}/>
+          <Route path='/admin/product-categories' element={<ProductCategories/>}/>
         </Route>
 
         <Route path='*' element={<NotFound/>}/>

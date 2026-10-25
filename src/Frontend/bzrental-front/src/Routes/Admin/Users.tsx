@@ -314,7 +314,7 @@ export default function Users() {
                                     <th>Użytkownik</th>
                                     <th>Login</th>
                                     <th>Data rejestracji</th>
-                                    <th className="fit">Operacje</th>
+                                    <th className="fit"></th>
                                 </tr>
                             </thead>
                             <tbody>
