@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import AuthService from "../../DAL/Auth/Services/AuthService";
 import type IPaginatedList from "../../DAL/Shared/Models/IPaginatedList";
 import type IPaginationParameters from "../../DAL/Shared/Models/IPaginationParameters";
-import type IUserDto from "../../DAL/Users/Dtos/IUserDto";
-import UsersService from "../../DAL/Users/Services/UsersService";
 import BzRentalFooter from "../../Components/Layout/BzRentalFooter";
 import { BzRentalNavbar } from "../../Components/Layout/BzRentalNavbar";
 import type IProductCategoryDto from "../../DAL/Products/Dtos/IProductCategoryDto";
@@ -17,6 +15,8 @@ import { ApiError } from "../../DAL/ApiAccess/ApiError";
 import { Modal } from "../../Components/Modal";
 import { AddProductCategory } from "../../Components/Products/AddProductCategory";
 import type IAddProductCategoryRequest from "../../DAL/Products/Requests/IAddProductCategoryRequest";
+import { UpdateProductCategory } from "../../Components/Products/UpdateProductCategory";
+import type IUpdateProductCategoryRequest from "../../DAL/Products/Requests/IUpdateProductCategoryRequest";
 
 export default function ProductCategories() {
     const navigate = useNavigate();
@@ -48,6 +48,9 @@ export default function ProductCategories() {
     }, [pagination.pageNumber]);
 
     const [isAddCatModalOpen, setIsAddCatModalOpen] = useState<boolean>(false);
+
+    const [isEditCatModalOpen, setIsEditCatModalOpen] = useState<boolean>(false);
+    const [editCatModalId, setEditCatModalId] = useState<number>(0);
 
     async function refreshData() {
         setIsLoading(true);
@@ -121,6 +124,28 @@ export default function ProductCategories() {
         finally {
             setIsLoading(false);
         }
+    }
+
+    async function handleEditCatModalSaveEvent(id: number, request: IUpdateProductCategoryRequest) {
+        setApiErrors([]);
+        setInfoMessages([]);
+        
+        setIsLoading(true);
+        
+        try {
+            await ProductsCategoriesAdminService.updateCategory(id, request);
+
+            setInfoMessages(['Zaktualizowano kategorię.']);
+            await refreshData();
+        }
+        finally {
+            setIsLoading(false);
+        }
+    }
+
+    function handleEdit(id: number): void {
+        setEditCatModalId(id);
+        setIsEditCatModalOpen(true);
     }
 
     return (
@@ -206,7 +231,7 @@ export default function ProductCategories() {
                                             {
                                                 !cat.isDeleted &&
                                                 <div className="btn-group">
-                                                    <button className="btn btn-outline-secondary">
+                                                    <button className="btn btn-outline-secondary" onClick={() => handleEdit(cat.id)}>
                                                         <div className="d-flex align-items-center">
                                                             <i className="fa fa-pencil"></i>
                                                             <span className="ms-2">Edytuj</span>
@@ -258,6 +283,18 @@ export default function ProductCategories() {
                 <AddProductCategory
                     setIsOpened={setIsAddCatModalOpen}
                     handleSave={handleAddCatModalSaveEvent}/>
+            </Modal>
+
+            <Modal
+                isOpened={isEditCatModalOpen}
+                setIsOpened={setIsEditCatModalOpen}
+                title="Edycja kategorii przedmiotów"
+                className="modal-xl"
+            >
+                <UpdateProductCategory
+                    setIsOpened={setIsEditCatModalOpen}
+                    handleSave={handleEditCatModalSaveEvent}
+                    categoryId={editCatModalId}/>
             </Modal>
 
             <BzRentalFooter/>
