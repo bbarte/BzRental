@@ -24,6 +24,7 @@ namespace BzRental.Application.Products
             services.AddScoped<IValidator<UpdateProductRequest>, UpdateProductValidator>();
 
             services.AddScoped<IProductCategoriesService, ProductCategoriesService>();
+            services.AddScoped<IProductsManagementService, ProductsManagementService>();
 
             return services;
         }
