@@ -15,7 +15,7 @@ namespace BzRental.Configuration.Products
                 .HasMaxLength(512);
 
             builder.Property(x => x.Description)
-                .HasColumnType("varchar(MAX)");
+                .HasMaxLength(2048);
 
             builder.HasIndex(x => x.Name);
             builder.HasIndex(x => x.HourPrice);

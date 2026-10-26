@@ -38,8 +38,8 @@ namespace BzRental.DbAccess.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(MAX)");
+                        .HasMaxLength(2048)
+                        .HasColumnType("varchar");
 
                     b.Property<decimal>("HourPrice")
                         .HasPrecision(19, 2)
