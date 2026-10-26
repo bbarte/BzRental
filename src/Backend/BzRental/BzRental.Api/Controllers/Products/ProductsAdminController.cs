@@ -4,6 +4,7 @@ using BzRental.Application.Products.Requests;
 using BzRental.Application.Products.Services;
 using BzRental.Application.Users;
 using BzRental.Shared.Contracts.Dtos;
+using BzRental.Shared.Pagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -19,6 +20,17 @@ namespace BzRental.Api.Controllers.Products
         public ProductsAdminController(IProductsManagementService service)
         {
             _service = service;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<PaginatedList<ProductAdminDto>>> GetProducts(
+            [FromQuery] PaginationParameters pagination,
+            [FromQuery] string? filter = null,
+            [FromQuery] int? categoryId = null,
+            [FromQuery] bool includeDeleted = false,
+            [FromQuery] string? orderBy = null)
+        {
+            return (await _service.GetProducts(pagination, filter, categoryId, includeDeleted, orderBy)).ToActionResult();
         }
 
         [HttpGet("fields-info/category/{id}")]

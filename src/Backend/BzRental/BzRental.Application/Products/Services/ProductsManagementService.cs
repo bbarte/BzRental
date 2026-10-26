@@ -1,11 +1,13 @@
 ﻿using BzRental.Application.Products.Dtos;
 using BzRental.Application.Products.Requests;
 using BzRental.DbAccess.Contexts;
+using BzRental.DbAccess.Extensions;
 using BzRental.Domain.Products.Enums;
 using BzRental.Domain.Products.Models;
 using BzRental.Shared.Contracts.Dtos;
 using BzRental.Shared.Errors;
 using BzRental.Shared.Extensions;
+using BzRental.Shared.Pagination;
 using BzRental.Shared.ResultPattern;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
@@ -21,11 +23,67 @@ namespace BzRental.Application.Products.Services
         private readonly IValidator<AddProductRequest> _addValidator;
         private readonly IValidator<UpdateProductRequest> _updateValidator;
 
-        public ProductsManagementService(BzRentalDbContext ctx, IValidator<AddProductRequest> addValidator, IValidator<UpdateProductRequest> updateValidator)
+        public ProductsManagementService(
+            BzRentalDbContext ctx,
+            IValidator<AddProductRequest> addValidator,
+            IValidator<UpdateProductRequest> updateValidator)
         {
             _ctx = ctx;
             _addValidator = addValidator;
             _updateValidator = updateValidator;
+        }
+
+        public async Task<Result<PaginatedList<ProductAdminDto>>> GetProducts(
+            PaginationParameters pagination,
+            string? filter = null,
+            int? categoryId = null,
+            bool includeDeleted = false,
+            string? orderBy = null)
+        {
+            IQueryable<Product> query = _ctx.Products;
+
+            if (!includeDeleted)
+                query = query.Where(x => !x.IsDeleted);
+
+            if (categoryId.HasValue)
+                query = query.Where(x => x.CategoryId == categoryId);
+
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                foreach (string keyword in filter.Split(' ').Take(10))
+                {
+                    query = query.Where(x => x.Name.Contains(keyword));
+                }
+            }
+
+            IQueryable<ProductAdminDto> dtoQuery = query
+                .Select(x => new ProductAdminDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Description = x.Description,
+                    HourPrice = x.HourPrice,
+                    CategoryId = x.CategoryId,
+                    CategoryName = x.Category.Name,
+                    IsDeleted = x.IsDeleted,
+                    CreatedAt = x.CreatedAt
+                });
+
+            if (!string.IsNullOrEmpty(orderBy))
+            {
+                if (orderBy == "asc(name)")
+                    dtoQuery = dtoQuery.OrderBy(x => x.Name);
+                else if (orderBy == "desc(name)")
+                    dtoQuery = dtoQuery.OrderByDescending(x => x.Name);
+                else if (orderBy == "asc(hourPrice)")
+                    dtoQuery = dtoQuery.OrderBy(x => x.HourPrice);
+                else if (orderBy == "desc(hourPrice)")
+                    dtoQuery = dtoQuery.OrderByDescending(x => x.HourPrice);
+            }
+
+            dtoQuery = dtoQuery.OrderBy(x => x.Id);
+
+            return await dtoQuery.ToPaginatedListAsync(pagination);
         }
 
         public async Task<Result<List<ProductFieldInfoDto>>> GetFieldsInfoForCategory(int id)
