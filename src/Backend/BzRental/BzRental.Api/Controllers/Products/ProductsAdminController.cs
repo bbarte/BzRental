@@ -117,7 +117,7 @@ namespace BzRental.Api.Controllers.Products
             foreach (IFormFile file in files)
             {
                 string extension = Path.GetExtension(file.FileName).ToLowerInvariant();
-                if (extension != ".jpeg" || extension != ".jpg" || extension != ".png" || extension != ".webp")
+                if (extension != ".jpeg" && extension != ".jpg" && extension != ".png" && extension != ".webp")
                     return Result.Failure(FileErrors.InvalidExtension, FailureType.BadRequest).ToActionResult();
 
                 string storedFileName = $"{Guid.NewGuid()}{extension}";
