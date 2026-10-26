@@ -125,6 +125,8 @@ namespace BzRental.Api
 
             app.UseExceptionHandler();
 
+            app.UseStaticFiles();
+
             app.MapControllers();
 
             app.Run();

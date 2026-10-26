@@ -11,6 +11,11 @@ namespace BzRental.Configuration.Products
         {
             builder.ApplyConfiguration(new ProductCategoryConfiguration());
             builder.ApplyConfiguration(new ProductCategoryFieldConfiguration());
+            
+            builder.ApplyConfiguration(new ProductConfiguration());
+            builder.ApplyConfiguration(new ProductFieldValueConfiguration());
+            builder.ApplyConfiguration(new ProductImageConfiguration());
+            builder.ApplyConfiguration(new ProductUserReviewConfiguration());
 
             return builder;
         }

@@ -22,6 +22,48 @@ namespace BzRental.DbAccess.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("BzRental.Domain.Products.Models.Product", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("varchar");
+
+                    b.Property<decimal>("HourPrice")
+                        .HasPrecision(19, 2)
+                        .HasColumnType("decimal(19,2)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("varchar");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("HourPrice");
+
+                    b.HasIndex("Name");
+
+                    b.ToTable("Products");
+                });
+
             modelBuilder.Entity("BzRental.Domain.Products.Models.ProductCategory", b =>
                 {
                     b.Property<int>("Id")
@@ -44,6 +86,108 @@ namespace BzRental.DbAccess.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ProductCategories");
+                });
+
+            modelBuilder.Entity("BzRental.Domain.Products.Models.ProductFieldValue", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("BoolValue")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<int>("FieldId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("NumberValue")
+                        .HasColumnType("float");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TextValue")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("varchar");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FieldId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductFieldValues");
+                });
+
+            modelBuilder.Entity("BzRental.Domain.Products.Models.ProductImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("varchar");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("varchar");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductImages");
+                });
+
+            modelBuilder.Entity("BzRental.Domain.Products.Models.ProductUserReview", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("varchar");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductUserReviews");
                 });
 
             modelBuilder.Entity("BzRental.Domain.Products.Models.ProductsCategoryField", b =>
@@ -136,6 +280,66 @@ namespace BzRental.DbAccess.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("BzRental.Domain.Products.Models.Product", b =>
+                {
+                    b.HasOne("BzRental.Domain.Products.Models.ProductCategory", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("BzRental.Domain.Products.Models.ProductFieldValue", b =>
+                {
+                    b.HasOne("BzRental.Domain.Products.Models.ProductsCategoryField", "Field")
+                        .WithMany()
+                        .HasForeignKey("FieldId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BzRental.Domain.Products.Models.Product", "Product")
+                        .WithMany("FieldValues")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Field");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("BzRental.Domain.Products.Models.ProductImage", b =>
+                {
+                    b.HasOne("BzRental.Domain.Products.Models.Product", "Product")
+                        .WithMany("Images")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("BzRental.Domain.Products.Models.ProductUserReview", b =>
+                {
+                    b.HasOne("BzRental.Domain.Users.Models.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BzRental.Domain.Products.Models.Product", "Product")
+                        .WithMany("UserReviews")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("BzRental.Domain.Products.Models.ProductsCategoryField", b =>
                 {
                     b.HasOne("BzRental.Domain.Products.Models.ProductCategory", "Category")
@@ -145,6 +349,15 @@ namespace BzRental.DbAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("BzRental.Domain.Products.Models.Product", b =>
+                {
+                    b.Navigation("FieldValues");
+
+                    b.Navigation("Images");
+
+                    b.Navigation("UserReviews");
                 });
 
             modelBuilder.Entity("BzRental.Domain.Products.Models.ProductCategory", b =>

@@ -1,0 +1,23 @@
+﻿using BzRental.Shared.Models;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace BzRental.Domain.Products.Models
+{
+    public class Product : DomainModel, ISoftDeletable
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public decimal HourPrice { get; set; } = 0m;
+
+        public ProductCategory Category { get; set; } = null!;
+        public int CategoryId { get; set; }
+
+        public List<ProductFieldValue> FieldValues { get; set; } = new();
+        public List<ProductImage> Images { get; set; } = new();
+        public List<ProductUserReview> UserReviews { get; set; } = new();
+
+        public bool IsDeleted { get; set; }
+    }
+}
