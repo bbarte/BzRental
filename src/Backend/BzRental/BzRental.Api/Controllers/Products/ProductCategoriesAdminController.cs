@@ -55,6 +55,12 @@ namespace BzRental.Api.Controllers.Products
             return (await _service.GetProductCategoryFieldById(id)).ToActionResult();
         }
 
+        [HttpGet("minimal")]
+        public async Task<ActionResult<List<ProductCategoryMinimalDto>>> GetMinimalProductCategories()
+        {
+            return (await _service.GetMinimalProductCategories()).ToActionResult();
+        }
+
         [HttpPost]
         public async Task<ActionResult<CreatedObjectDto<int>>> AddProductCategory(
             [FromBody] AddProductCategoryRequest request)
