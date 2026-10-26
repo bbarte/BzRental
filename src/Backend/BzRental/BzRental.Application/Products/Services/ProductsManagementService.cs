@@ -66,7 +66,10 @@ namespace BzRental.Application.Products.Services
                     CategoryId = x.CategoryId,
                     CategoryName = x.Category.Name,
                     IsDeleted = x.IsDeleted,
-                    CreatedAt = x.CreatedAt
+                    CreatedAt = x.CreatedAt,
+                    FirstImageFileName = x.Images
+                        .Select(x => x.FileName)
+                        .FirstOrDefault()
                 });
 
             if (!string.IsNullOrEmpty(orderBy))

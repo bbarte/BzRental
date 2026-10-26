@@ -12,6 +12,8 @@ namespace BzRental.Application.Products.Dtos
         public string Description { get; set; } = string.Empty;
         public decimal HourPrice { get; set; } = 0m;
 
+        public string? FirstImageFileName { get; set; }
+
         public int CategoryId { get; set; }
         public string CategoryName { get; set; } = string.Empty;
 
