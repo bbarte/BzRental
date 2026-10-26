@@ -33,6 +33,12 @@ namespace BzRental.Api.Controllers.Products
             return (await _service.GetProducts(pagination, filter, categoryId, includeDeleted, orderBy)).ToActionResult();
         }
 
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ProductAdminDetailsDto>> GetProductById(int id)
+        {
+            return (await _service.GetProductById(id)).ToActionResult();
+        }
+
         [HttpGet("fields-info/category/{id}")]
         public async Task<ActionResult<List<ProductFieldInfoDto>>> GetFieldsInfoForCategory(
             [FromRoute] int id)

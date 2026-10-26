@@ -89,6 +89,33 @@ namespace BzRental.Application.Products.Services
             return await dtoQuery.ToPaginatedListAsync(pagination);
         }
 
+        public async Task<Result<ProductAdminDetailsDto>> GetProductById(int id)
+        {
+            ProductAdminDetailsDto? dto = await _ctx.Products
+                .Where(x => x.Id == id)
+                .Select(x => new ProductAdminDetailsDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Description = x.Description,
+                    HourPrice = x.HourPrice,
+                    CategoryId = x.CategoryId,
+                    IsDeleted = x.IsDeleted,
+                    CreatedAt = x.CreatedAt
+                })
+                .FirstOrDefaultAsync();
+
+            if (dto == null)
+                return SharedErrors.NotFound;
+
+            dto.ImageFileNames = await _ctx.ProductImages
+                .Where(x => x.ProductId == id)
+                .Select(x => x.FileName)
+                .ToListAsync();
+
+            return dto;
+        }
+
         public async Task<Result<List<ProductFieldInfoDto>>> GetFieldsInfoForCategory(int id)
         {
             return await _ctx.ProductsCategoryFields

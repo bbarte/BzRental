@@ -18,6 +18,8 @@ namespace BzRental.Application.Products.Services
             bool includeDeleted = false,
             string? orderBy = null);
 
+        Task<Result<ProductAdminDetailsDto>> GetProductById(int id);
+
         Task<Result<List<ProductFieldInfoDto>>> GetFieldsInfoForCategory(int id);
         Task<Result<List<ProductFieldInfoDto>>> GetFieldsInfoForProductById(int id);
 
