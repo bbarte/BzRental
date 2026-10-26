@@ -1,4 +1,5 @@
 ﻿using BzRental.Api.Extensions;
+using BzRental.Application.Products.Dtos;
 using BzRental.Application.Products.Requests;
 using BzRental.Application.Products.Services;
 using BzRental.Application.Users;
@@ -18,6 +19,20 @@ namespace BzRental.Api.Controllers.Products
         public ProductsAdminController(IProductsManagementService service)
         {
             _service = service;
+        }
+
+        [HttpGet("fields-info/category/{id}")]
+        public async Task<ActionResult<List<ProductFieldInfoDto>>> GetFieldsInfoForCategory(
+            [FromRoute] int id)
+        {
+            return (await _service.GetFieldsInfoForCategory(id)).ToActionResult();
+        }
+
+        [HttpGet("{id}/fields-info")]
+        public async Task<ActionResult<List<ProductFieldInfoDto>>> GetFieldsInfoForProductById(
+            [FromRoute] int id)
+        {
+            return (await _service.GetFieldsInfoForProductById(id)).ToActionResult();
         }
 
         [HttpPost]

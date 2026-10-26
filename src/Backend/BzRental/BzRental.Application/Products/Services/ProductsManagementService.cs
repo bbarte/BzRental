@@ -1,4 +1,5 @@
-﻿using BzRental.Application.Products.Requests;
+﻿using BzRental.Application.Products.Dtos;
+using BzRental.Application.Products.Requests;
 using BzRental.DbAccess.Contexts;
 using BzRental.Domain.Products.Enums;
 using BzRental.Domain.Products.Models;
@@ -25,6 +26,57 @@ namespace BzRental.Application.Products.Services
             _ctx = ctx;
             _addValidator = addValidator;
             _updateValidator = updateValidator;
+        }
+
+        public async Task<Result<List<ProductFieldInfoDto>>> GetFieldsInfoForCategory(int id)
+        {
+            return await _ctx.ProductsCategoryFields
+                .Where(x => x.CategoryId == id)
+                .Select(x => new ProductFieldInfoDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Type = x.Type,
+                    UnitName = x.UnitName
+                })
+                .ToListAsync();
+        }
+
+        public async Task<Result<List<ProductFieldInfoDto>>> GetFieldsInfoForProductById(int id)
+        {
+            int? productsCategoryId = await _ctx.Products
+                .Where(x => x.Id == id)
+                .Select(x => x.CategoryId)
+                .FirstOrDefaultAsync();
+
+            if (productsCategoryId == null)
+                return SharedErrors.NotFound;
+
+            return await _ctx.ProductsCategoryFields
+                .Where(x => x.CategoryId == productsCategoryId)
+                .Select(x => new ProductFieldInfoDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Type = x.Type,
+                    UnitName = x.UnitName,
+
+                    TextValue = _ctx.ProductFieldValues
+                        .Where(y => y.ProductId == id && y.FieldId == x.Id)
+                        .Select(x => x.TextValue)
+                        .FirstOrDefault(),
+
+                    NumberValue = _ctx.ProductFieldValues
+                        .Where(y => y.ProductId == id && y.FieldId == x.Id)
+                        .Select(x => x.NumberValue)
+                        .FirstOrDefault(),
+
+                    BoolValue = _ctx.ProductFieldValues
+                        .Where(y => y.ProductId == id && y.FieldId == x.Id)
+                        .Select(x => x.BoolValue)
+                        .FirstOrDefault()
+                })
+                .ToListAsync();
         }
 
         public async Task<Result<CreatedObjectDto<int>>> AddProduct(AddProductRequest request)
