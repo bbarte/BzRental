@@ -1,13 +1,19 @@
 ﻿using BzRental.Api.Extensions;
 using BzRental.Application.Products.Dtos;
+using BzRental.Application.Products.Errors;
 using BzRental.Application.Products.Requests;
 using BzRental.Application.Products.Services;
 using BzRental.Application.Users;
+using BzRental.DbAccess.Contexts;
+using BzRental.Domain.Products.Models;
 using BzRental.Shared.Contracts.Dtos;
+using BzRental.Shared.Errors;
 using BzRental.Shared.Pagination;
+using BzRental.Shared.ResultPattern;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BzRental.Api.Controllers.Products
 {
@@ -16,10 +22,17 @@ namespace BzRental.Api.Controllers.Products
     public class ProductsAdminController : ControllerBase
     {
         private readonly IProductsManagementService _service;
+        private readonly BzRentalDbContext _ctx;
+        private readonly IWebHostEnvironment _env;
 
-        public ProductsAdminController(IProductsManagementService service)
+        public ProductsAdminController(
+            IProductsManagementService service,
+            BzRentalDbContext ctx,
+            IWebHostEnvironment env)
         {
             _service = service;
+            _ctx = ctx;
+            _env = env;
         }
 
         [HttpGet]
@@ -80,6 +93,52 @@ namespace BzRental.Api.Controllers.Products
             [FromRoute] int id)
         {
             return (await _service.RecoverProduct(id)).ToActionResult();
+        }
+
+        [HttpPost("{productId}/images")]
+        public async Task<IActionResult> UploadProductImages(
+            [FromRoute] int productId,
+            [FromForm] List<IFormFile> files)
+        {
+            bool doesProductExist = await _ctx.Products.AnyAsync(x => x.Id == productId);
+            if (!doesProductExist)
+                return Result.Failure(SharedErrors.NotFound, FailureType.NotFound).ToActionResult();
+
+            if (files == null || files.Count == 0)
+                return Result.Failure(FileErrors.NoFilesProvided, FailureType.BadRequest).ToActionResult();
+
+            string uploadsFolder = Path.Combine(_env.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "uploads");
+
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
+            List<ProductImage> productImages = new();
+
+            foreach (IFormFile file in files)
+            {
+                string extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+                if (extension != ".jpeg" || extension != ".jpg" || extension != ".png" || extension != ".webp")
+                    return Result.Failure(FileErrors.InvalidExtension, FailureType.BadRequest).ToActionResult();
+
+                string storedFileName = $"{Guid.NewGuid()}{extension}";
+                string filePath = Path.Combine(uploadsFolder, storedFileName);
+
+                using (FileStream stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                }
+
+                productImages.Add(new ProductImage
+                {
+                    ProductId = productId,
+                    FileName = storedFileName
+                });
+            }
+
+            _ctx.ProductImages.AddRange(productImages);
+            await _ctx.SaveChangesAsync();
+
+            return Result.Success().ToActionResult();
         }
     }
 }
