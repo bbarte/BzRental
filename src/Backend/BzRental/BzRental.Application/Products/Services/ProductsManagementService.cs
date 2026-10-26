@@ -249,23 +249,31 @@ namespace BzRental.Application.Products.Services
             prod.HourPrice = request.HourPrice;
             prod.CategoryId = request.CategoryId;
 
-            if (request.UpdateFieldValues)
+            if (request.UpdateFieldValues && request.FieldValues != null)
             {
-                foreach (ProductFieldValue dbField in prod.FieldValues)
+                foreach (SetProductFieldValueRequest setFieldRequest in request.FieldValues.DistinctBy(x => x.FieldId))
                 {
-                    SetProductFieldValueRequest? setRequest = request.FieldValues?
-                        .FirstOrDefault(x => x.FieldId == dbField.FieldId);
+                    ProductFieldValue? dbField = prod.FieldValues.FirstOrDefault(x => x.FieldId == setFieldRequest.FieldId);
 
-                    if (setRequest == null) continue;
-
-                    if (!string.IsNullOrWhiteSpace(setRequest.TextValue))
-                        dbField.TextValue = setRequest.TextValue;
-
-                    if (setRequest.BoolValue.HasValue)
-                        dbField.BoolValue = setRequest.BoolValue.Value;
-
-                    if (setRequest.NumberValue.HasValue)
-                        dbField.NumberValue = setRequest.NumberValue.Value;
+                    if (dbField != null)
+                    {
+                        if (!string.IsNullOrWhiteSpace(setFieldRequest.TextValue))
+                            dbField.TextValue = setFieldRequest.TextValue;
+                        if (setFieldRequest.BoolValue.HasValue)
+                            dbField.BoolValue = setFieldRequest.BoolValue.Value;
+                        if (setFieldRequest.NumberValue.HasValue)
+                            dbField.NumberValue = setFieldRequest.NumberValue.Value;
+                    }
+                    else
+                    {
+                        prod.FieldValues.Add(new ProductFieldValue
+                        {
+                            FieldId = setFieldRequest.FieldId,
+                            TextValue = setFieldRequest.TextValue ?? string.Empty,
+                            BoolValue = setFieldRequest.BoolValue ?? false,
+                            NumberValue = setFieldRequest.NumberValue ?? 0d
+                        });
+                    }
                 }
             }
 
