@@ -3,6 +3,7 @@ import type IPaginatedList from "../../Shared/Models/IPaginatedList";
 import type IPaginationParameters from "../../Shared/Models/IPaginationParameters";
 import type IProductCategoryDto from "../Dtos/IProductCategoryDto";
 import type { IProductCategoryFieldDto } from "../Dtos/IProductCategoryFieldDto";
+import type IProductCategoryMinimalDto from "../Dtos/IProductCategoryMinimalDto";
 import type IAddProductCategoryFieldRequest from "../Requests/IAddProductCategoryFieldRequest";
 import type IAddProductCategoryRequest from "../Requests/IAddProductCategoryRequest";
 import type IUpdateProductCategoryFieldRequest from "../Requests/IUpdateProductCategoryFieldRequest";
@@ -58,6 +59,14 @@ export default class ProductsCategoriesAdminService {
     public static async getCategoryFieldById(id: number): Promise<IProductCategoryFieldDto> {
         const {data} = await ApiClient.instance.http.get<IProductCategoryFieldDto>(
             `admin/product-categories/fields/${id}`);
+
+        return data;
+    }
+
+    public static async getMinimalCategories(): Promise<IProductCategoryMinimalDto[]> {
+        const {data} = await ApiClient.instance.http.get<IProductCategoryMinimalDto[]>(
+            'admin/product-categories/minimal'
+        );
 
         return data;
     }
