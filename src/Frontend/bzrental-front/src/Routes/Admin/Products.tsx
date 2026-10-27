@@ -237,7 +237,7 @@ export default function Products() {
                                                 </h5>
                                                 <div className="card-text">
                                                     <h6>{prod.hourPrice} zł/godz</h6>
-                                                    <span className="badge bg-secondary">{prod.categoryName}</span>
+                                                    <span className="badge border border-primary text-primary">{prod.categoryName}</span>
                                                     {
                                                         prod.isDeleted &&
                                                         <span className="badge bg-danger">usunięte</span>
