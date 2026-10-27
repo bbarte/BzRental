@@ -62,6 +62,9 @@ export function BzRentalNavbar({isUserLoggedIn, handleLogout}: BzRentalNavbarPro
                                         <li>
                                             <NavLink to='/admin/product-categories' className='dropdown-item'>Kategorie przedmiotów</NavLink>
                                         </li>
+                                        <li>
+                                            <NavLink to='/admin/products' className='dropdown-item'>Produkty</NavLink>
+                                        </li>
                                     </ul>
                                 </li>
                             }
