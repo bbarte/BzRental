@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import AuthService from "../../DAL/Auth/Services/AuthService";
 import { BzRentalNavbar } from "../../Components/Layout/BzRentalNavbar";
 import BzRentalFooter from "../../Components/Layout/BzRentalFooter";
@@ -172,6 +172,11 @@ export default function Products() {
                                                     ))
                                                 }
                                             </select>
+                                            <div className="input-group-text">
+                                                <Link to="/admin/product-categories">
+                                                    <i className="fa fa-cog"></i>
+                                                </Link>
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="mb-2">
