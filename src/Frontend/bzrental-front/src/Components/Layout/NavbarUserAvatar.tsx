@@ -14,7 +14,7 @@ export function NavbarUserAvatar({userInfo, handleLogout}: NavbarUserAvatarProps
         <>
             <div className="dropdown">
                 <button className="btn btn-warning bg-warning-subtle bg-gradient" data-bs-toggle="dropdown">
-                    <i className="fa fa-user"></i>
+                    <i className="fa fa-user-circle"></i>
                     <span className="ms-2">{`${userInfo.firstName} ${userInfo.lastName}`}</span>
                 </button>
 
