@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import AuthService from "../../DAL/Auth/Services/AuthService";
 import { BzRentalNavbar } from "../../Components/Layout/BzRentalNavbar";
 import BzRentalFooter from "../../Components/Layout/BzRentalFooter";
-import type IProductCategoryDto from "../../DAL/Products/Dtos/IProductCategoryDto";
 import type IPaginatedList from "../../DAL/Shared/Models/IPaginatedList";
 import type IPaginationParameters from "../../DAL/Shared/Models/IPaginationParameters";
 import type IProductAdminDto from "../../DAL/Products/Dtos/IProductAdminDto";
@@ -228,7 +227,7 @@ export default function Products() {
                             {
                                 products.items.length > 0 &&
                                 products.items.map(prod => (
-                                    <div key={prod.id} className="col-4">
+                                    <div key={prod.id} className="col-lg-4 col-md-6">
                                         <div className="card shadow-sm">
                                             <ImageFromApi fileName={prod.firstImageFileName} className="card-img-top"/>
                                             <div className="card-body">
