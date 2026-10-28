@@ -14,6 +14,9 @@ import ProductsCategoriesAdminService from "../../DAL/Products/Services/Products
 import Loader from "../../Components/Loader";
 import { Paginator } from "../../Components/Paginator";
 import { ImageFromApi } from "../../Components/ImageFromApi";
+import { Modal } from "../../Components/Modal";
+import { AddProduct } from "../../Components/Products/AddProduct";
+import type IAddProductRequest from "../../DAL/Products/Requests/IAddProductRequest";
 
 export default function Products() {
     const navigate = useNavigate();
@@ -45,6 +48,8 @@ export default function Products() {
     useEffect(() => {
         refreshData();
     }, [pagination.pageNumber, productsOrderBy, productsCategoryIdFilter])
+
+    const [isAddProductModalOpen, setIsAddProductModalOpen] = useState<boolean>(false);
 
     async function refreshData() {
         setIsLoading(true);
@@ -123,6 +128,14 @@ export default function Products() {
         }
     }
 
+    function handleAddProductModalSaveEvent(request: IAddProductRequest, images: FileList | File[]) {
+        console.log(request);
+    }
+
+    function handleBtnNewClick() {
+        setIsAddProductModalOpen(true);
+    }
+
     return (
         <>
             <BzRentalNavbar
@@ -133,7 +146,7 @@ export default function Products() {
                 <h1 className="mb-4">Przedmioty</h1>
 
                 <div className="btn-group mb-4">
-                    <button className="btn btn-outline-success">
+                    <button className="btn btn-outline-success" onClick={handleBtnNewClick}>
                         <i className="fa fa-plus"></i>
                         <span className="ms-2">Nowy</span>
                     </button>
@@ -294,6 +307,17 @@ export default function Products() {
                     </div>
                 </div>
             </div>
+
+            <Modal
+                isOpened={isAddProductModalOpen}
+                setIsOpened={setIsAddProductModalOpen}
+                title="Dodawanie przedmiotu"
+                className="modal-xl"
+            >
+                <AddProduct
+                    setIsOpened={setIsAddProductModalOpen}
+                    handleSave={handleAddProductModalSaveEvent}/>
+            </Modal>
 
             <BzRentalFooter/>
         </>

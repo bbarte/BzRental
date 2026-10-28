@@ -4,7 +4,7 @@ import { ErrorMessagesList } from "../ErrorMessagesList";
 import Loader from "../Loader";
 import type IProductCategoryMinimalDto from "../../DAL/Products/Dtos/IProductCategoryMinimalDto";
 import ProductsCategoriesAdminService from "../../DAL/Products/Services/ProductsCategoriesAdminService";
-import IProductFieldInfoDto from "../../DAL/Products/Dtos/ProductFieldInfoDto";
+import type IProductFieldInfoDto from "../../DAL/Products/Dtos/ProductFieldInfoDto";
 import ProductsAdminService from "../../DAL/Products/Services/ProductsAdminService";
 import { ProductsCategoryFieldType } from "../../DAL/Products/Dtos/IProductCategoryFieldDto";
 
@@ -66,57 +66,83 @@ export function AddProduct({handleSave, setIsOpened}: AddProductProps) {
         setIsLoading(false);
     }
 
+    function handleBtnSaveClick() {
+        setApiErrors([]);
+
+        if (request.name.trim() === '') {
+            setApiErrors(['Należy podać nazwę']);
+            return;
+        }
+
+        if (request.hourPrice <= 0) {
+            setApiErrors(['Cena za godzinę nie może być ujemna ani zerowa']);
+            return;
+        }
+
+        handleSave(request, []);
+
+        setIsOpened(false);
+    }
+
     return (
         <>
             <div className="loader-host">
                 <ErrorMessagesList errors={apiErrors} className={"mb-3"}/>
 
-                <div>
-                    <div className="row-mb-2">
-                        <label htmlFor="name" className="col-sm-4 col-form-label">Nazwa:</label>
-                        <input
-                            type="text" name="name" id="name" className="col-sm-8 form-control" maxLength={512}
-                            value={request.name} onChange={(e) => setRequest({
-                                ...request,
-                                name: e.target.value
-                            })}/>
-                    </div>
-                    <div className="row-mb-2">
-                        <label htmlFor="description" className="col-sm-4 col-form-label">Opis:</label>
-                        <textarea
-                            name="description" id="description" className="col-sm-8 form-control" maxLength={2048}
-                            value={request.description} onChange={(e) => setRequest({
-                                ...request,
-                                description: e.target.value
-                            })}/>
-                    </div>
-                    <div className="row-mb-2">
-                        <label htmlFor="hourPrice" className="col-sm-4 col-form-label">Cena za godzinę:</label>
-                        <div className="input-group col-sm-8">
+                <div className="mb-3">
+                    <div className="row mb-2">
+                        <label htmlFor="name" className="col-sm-2 col-form-label">Nazwa:</label>
+                        <div className="col-sm-10">
                             <input
-                                type="number" name="hourPrice" id="hourPrice" className="form-control"
-                                step={0.01} value={request.hourPrice} onChange={(e) => setRequest({
+                                type="text" name="name" id="name" className="form-control" maxLength={512}
+                                value={request.name} onChange={(e) => setRequest({
                                     ...request,
-                                    hourPrice: +e.target.value
+                                    name: e.target.value
                                 })}/>
-                            <div className="input-group-text">zł</div>
                         </div>
                     </div>
-                    <div className="row-mb-2">
-                        <label htmlFor="categoryId" className="col-sm-4 col-form-label">Kategoria:</label>
-                        <select
-                            name="categoryId" id="categoryId" className="form-select"
-                            value={request.categoryId} onChange={(e) => setRequest({
-                                ...request,
-                                categoryId: +e.target.value
-                            })}
-                        >
-                            {
-                                minimalCategories.map(x => (
-                                    <option value={x.id} key={x.id}>{x.name}</option>
-                                ))
-                            }
-                        </select>
+                    <div className="row mb-2">
+                        <label htmlFor="description" className="col-sm-2 col-form-label">Opis:</label>
+                        <div className="col-sm-10">
+                            <textarea
+                                name="description" id="description" className="form-control" maxLength={2048}
+                                value={request.description} onChange={(e) => setRequest({
+                                    ...request,
+                                    description: e.target.value
+                                })}/>
+                        </div>
+                    </div>
+                    <div className="row mb-2">
+                        <label htmlFor="hourPrice" className="col-sm-2 col-form-label">Cena za godzinę:</label>
+                        <div className="col-sm-10">
+                            <div className="input-group">
+                                <input
+                                    type="number" name="hourPrice" id="hourPrice" className="form-control"
+                                    step={0.01} value={request.hourPrice} onChange={(e) => setRequest({
+                                        ...request,
+                                        hourPrice: +e.target.value
+                                    })}/>
+                                <div className="input-group-text">zł</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <label htmlFor="categoryId" className="col-sm-2 col-form-label">Kategoria:</label>
+                        <div className="col-sm-10">
+                            <select
+                                name="categoryId" id="categoryId" className="form-select"
+                                value={request.categoryId} onChange={(e) => setRequest({
+                                    ...request,
+                                    categoryId: +e.target.value
+                                })}
+                            >
+                                {
+                                    minimalCategories.map(x => (
+                                        <option value={x.id} key={x.id}>{x.name}</option>
+                                    ))
+                                }
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -135,49 +161,131 @@ export function AddProduct({handleSave, setIsOpened}: AddProductProps) {
                             fieldsInfo.length > 0 &&
                             fieldsInfo.map(fieldInfo => (
                                 <div key={fieldInfo.id} className="row mb-2">
-                                    <div className="col-4">{fieldInfo.name}</div>
-                                    <div className="col-8 input-group">
-                                        {
-                                            fieldInfo.type === ProductsCategoryFieldType.Text &&
-                                            <input
-                                                type="text" className="form-control" maxLength={512}
-                                                value={
-                                                    request.fieldValues.some(x => x.fieldId === fieldInfo.id)
-                                                        ? request.fieldValues.find(x => x.fieldId === fieldInfo.id)?.textValue ?? ''
-                                                        : ''
-                                                }
-                                                onChange={(e) => {
-                                                    const val = request.fieldValues.find(x => x.fieldId === fieldInfo.id);
-
-                                                    if (val !== undefined) {
-                                                        setRequest({
-                                                            ...request,
-                                                            fieldValues: request.fieldValues.map(x =>
-                                                                x.fieldId === fieldInfo.id
-                                                                    ? { ...x, textValue: e.target.value }
-                                                                    : x
-                                                            )
-                                                        });
-                                                    } else {
-                                                        setRequest({
-                                                            ...request,
-                                                            fieldValues: [
-                                                                ...request.fieldValues,
-                                                                {
-                                                                    fieldId: fieldInfo.id,
-                                                                    textValue: e.target.value
-                                                                }
-                                                            ]
-                                                        });
+                                    <div className="col-2">
+                                        <label className="form-label">{fieldInfo.name}</label>
+                                    </div>
+                                    <div className="col-10">
+                                        <div className="input-group">
+                                            {
+                                                fieldInfo.type === ProductsCategoryFieldType.Text &&
+                                                <input
+                                                    type="text" className="form-control" maxLength={512}
+                                                    value={
+                                                        request.fieldValues.some(x => x.fieldId === fieldInfo.id)
+                                                            ? request.fieldValues.find(x => x.fieldId === fieldInfo.id)?.textValue ?? ''
+                                                            : ''
                                                     }
-                                                }}/>
-                                        }
-                                        {
-                                            (fieldInfo.unitName !== null && (fieldInfo.type === ProductsCategoryFieldType.Decimal || fieldInfo.type === ProductsCategoryFieldType.Integer)) &&
-                                            <div className="input-group-text">
-                                                {fieldInfo.unitName}
-                                            </div>
-                                        }
+                                                    onChange={(e) => {
+                                                        const val = request.fieldValues.find(x => x.fieldId === fieldInfo.id);
+
+                                                        if (val !== undefined) {
+                                                            setRequest({
+                                                                ...request,
+                                                                fieldValues: request.fieldValues.map(x =>
+                                                                    x.fieldId === fieldInfo.id
+                                                                        ? { ...x, textValue: e.target.value }
+                                                                        : x
+                                                                )
+                                                            });
+                                                        } else {
+                                                            setRequest({
+                                                                ...request,
+                                                                fieldValues: [
+                                                                    ...request.fieldValues,
+                                                                    {
+                                                                        fieldId: fieldInfo.id,
+                                                                        textValue: e.target.value
+                                                                    }
+                                                                ]
+                                                            });
+                                                        }
+                                                    }}/>
+                                            }
+                                            {
+                                                (fieldInfo.type === ProductsCategoryFieldType.Integer || fieldInfo.type === ProductsCategoryFieldType.Decimal) &&
+                                                <input
+                                                    type="number" className="form-control" maxLength={512}
+                                                    value={
+                                                        request.fieldValues.some(x => x.fieldId === fieldInfo.id)
+                                                            ? request.fieldValues.find(x => x.fieldId === fieldInfo.id)?.numberValue ?? ''
+                                                            : ''
+                                                    }
+                                                    step={fieldInfo.type === ProductsCategoryFieldType.Integer ? 1 : 0.01}
+                                                    onChange={(e) => {
+                                                        const val = request.fieldValues.find(x => x.fieldId === fieldInfo.id);
+
+                                                        if (val !== undefined) {
+                                                            setRequest({
+                                                                ...request,
+                                                                fieldValues: request.fieldValues.map(x =>
+                                                                    x.fieldId === fieldInfo.id
+                                                                        ? { ...x, numberValue: +e.target.value }
+                                                                        : x
+                                                                )
+                                                            });
+                                                        } else {
+                                                            setRequest({
+                                                                ...request,
+                                                                fieldValues: [
+                                                                    ...request.fieldValues,
+                                                                    {
+                                                                        fieldId: fieldInfo.id,
+                                                                        numberValue: +e.target.value
+                                                                    }
+                                                                ]
+                                                            });
+                                                        }
+                                                    }}/>
+                                            }
+                                            {
+                                                fieldInfo.type === ProductsCategoryFieldType.Boolean &&
+                                                <div className="form-check">
+                                                    <input
+                                                        type="checkbox" className="form-check-input"
+                                                        checked={
+                                                            request.fieldValues.some(x => x.fieldId === fieldInfo.id)
+                                                                ? request.fieldValues.find(x => x.fieldId === fieldInfo.id)?.boolValue ?? false
+                                                                : false
+                                                        }
+                                                        onChange={(e) => {
+                                                            const val = request.fieldValues.find(x => x.fieldId === fieldInfo.id);
+
+                                                            if (val != undefined) {
+                                                                setRequest({
+                                                                    ...request,
+                                                                    fieldValues: request.fieldValues.map(x =>
+                                                                        x.fieldId === fieldInfo.id
+                                                                            ? { ...x, boolValue: e.target.checked }
+                                                                            : x
+                                                                    )
+                                                                });
+                                                            } else {
+                                                                setRequest({
+                                                                    ...request,
+                                                                    fieldValues: [
+                                                                        ...request.fieldValues,
+                                                                        {
+                                                                            fieldId: fieldInfo.id,
+                                                                            boolValue: e.target.checked
+                                                                        }
+                                                                    ]
+                                                                })
+                                                            }
+                                                        }}/>
+                                                </div>
+                                            }
+
+                                            {
+                                                (
+                                                    fieldInfo.unitName !== null &&
+                                                    (fieldInfo.type === ProductsCategoryFieldType.Decimal || fieldInfo.type === ProductsCategoryFieldType.Integer) &&
+                                                    fieldInfo.unitName?.trim() !== ''
+                                                ) &&
+                                                <div className="input-group-text">
+                                                    {fieldInfo.unitName}
+                                                </div>
+                                            }
+                                        </div>
                                     </div>
                                 </div>
                             ))
@@ -186,7 +294,7 @@ export function AddProduct({handleSave, setIsOpened}: AddProductProps) {
                 </div>
 
                 <div className="d-flex justify-content-end border-top pt-2 mt-4">
-                    <button className="btn btn-success">
+                    <button className="btn btn-success" onClick={handleBtnSaveClick}>
                         <i className="fa fa-save"></i>
                         <span className="ms-2">Zapisz</span>
                     </button>
