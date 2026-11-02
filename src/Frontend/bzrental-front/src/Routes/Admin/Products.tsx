@@ -242,7 +242,7 @@ export default function Products() {
                     </div>
 
                     <div className="col-md-8 loader-host">
-                        <div className="row mb-4">
+                        <div className="row mb-4 g-2">
                             {
                                 products.items.length === 0 &&
                                 <span>
