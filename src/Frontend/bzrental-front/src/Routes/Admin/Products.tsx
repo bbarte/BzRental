@@ -17,6 +17,8 @@ import { ImageFromApi } from "../../Components/ImageFromApi";
 import { Modal } from "../../Components/Modal";
 import { AddProduct } from "../../Components/Products/AddProduct";
 import type IAddProductRequest from "../../DAL/Products/Requests/IAddProductRequest";
+import { UpdateProduct } from "../../Components/Products/UpdateProduct";
+import type IUpdateProductRequest from "../../DAL/Products/Requests/IUpdateProductRequest";
 
 export default function Products() {
     const navigate = useNavigate();
@@ -50,6 +52,9 @@ export default function Products() {
     }, [pagination.pageNumber, productsOrderBy, productsCategoryIdFilter])
 
     const [isAddProductModalOpen, setIsAddProductModalOpen] = useState<boolean>(false);
+
+    const [isUpdateProductModalOpen, setIsUpdateProductModalOpen] = useState<boolean>(false);
+    const [updateProductModalId, setUpdateProductModalId] = useState<number>(0);
 
     async function refreshData() {
         setIsLoading(true);
@@ -148,6 +153,28 @@ export default function Products() {
 
     function handleBtnNewClick() {
         setIsAddProductModalOpen(true);
+    }
+
+    function handleEdit(id: number) {
+        setUpdateProductModalId(id);
+        setIsUpdateProductModalOpen(true);
+    }
+
+    async function handleUpdateProductModalSaveEvent(id: number, request: IUpdateProductRequest) {
+        setApiErrors([]);
+        setInfoMessages([]);
+
+        setIsLoading(true);
+
+        try {
+            await ProductsAdminService.updateProduct(id, request);
+
+            setInfoMessages(['Zaktualizowano przedmiot.']);
+            await refreshData();
+        }
+        finally {
+            setIsLoading(false);
+        }
     }
 
     return (
@@ -278,7 +305,7 @@ export default function Products() {
                                                 {
                                                     !prod.isDeleted &&
                                                     <div className="btn-group">
-                                                        <button className="btn btn-outline-secondary">
+                                                        <button className="btn btn-outline-secondary" onClick={() => handleEdit(prod.id)}>
                                                             <div className="d-flex align-items-center">
                                                                 <i className="fa fa-pencil"></i>
                                                                 <span className="ms-2">Edytuj</span>
@@ -326,11 +353,25 @@ export default function Products() {
                 isOpened={isAddProductModalOpen}
                 setIsOpened={setIsAddProductModalOpen}
                 title="Dodawanie przedmiotu"
-                className="modal-xl"
-            >
+                className="modal-xl">
+
                 <AddProduct
                     setIsOpened={setIsAddProductModalOpen}
                     handleSave={handleAddProductModalSaveEvent}/>
+                
+            </Modal>
+
+            <Modal
+                isOpened={isUpdateProductModalOpen}
+                setIsOpened={setIsUpdateProductModalOpen}
+                title="Edycja przedmiotu"
+                className="modal-xl">
+
+                <UpdateProduct
+                    setIsOpened={setIsUpdateProductModalOpen}
+                    productId={updateProductModalId}
+                    handleSave={handleUpdateProductModalSaveEvent}/>
+
             </Modal>
 
             <BzRentalFooter/>
