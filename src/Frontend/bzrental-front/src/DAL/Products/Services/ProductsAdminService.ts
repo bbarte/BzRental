@@ -1,4 +1,5 @@
 import { ApiClient } from "../../ApiAccess/ApiClient";
+import type ICreatedObjectDto from "../../Shared/Models/ICreatedObjectDto";
 import type IPaginatedList from "../../Shared/Models/IPaginatedList";
 import type IPaginationParameters from "../../Shared/Models/IPaginationParameters";
 import type IProductAdminDetailsDto from "../Dtos/IProductAdminDetailsDto";
@@ -56,8 +57,10 @@ export default class ProductsAdminService {
         return data;
     }
 
-    public static async addProduct(request: IAddProductRequest): Promise<void> {
-        await ApiClient.instance.http.post('admin/products', request);
+    public static async addProduct(request: IAddProductRequest): Promise<ICreatedObjectDto<number>> {
+        const {data} = await ApiClient.instance.http.post<ICreatedObjectDto<number>>('admin/products', request);
+
+        return data;
     }
 
     public static async updateProduct(id: number, request: IUpdateProductRequest): Promise<void> {
