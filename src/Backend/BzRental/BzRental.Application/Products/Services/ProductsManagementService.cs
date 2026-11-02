@@ -75,16 +75,35 @@ namespace BzRental.Application.Products.Services
             if (!string.IsNullOrEmpty(orderBy))
             {
                 if (orderBy == "asc(name)")
-                    dtoQuery = dtoQuery.OrderBy(x => x.Name);
+                {
+                    dtoQuery = dtoQuery
+                        .OrderBy(x => x.Name)
+                        .ThenBy(x => x.Id);
+                }
                 else if (orderBy == "desc(name)")
-                    dtoQuery = dtoQuery.OrderByDescending(x => x.Name);
+                {
+                    dtoQuery = dtoQuery
+                        .OrderByDescending(x => x.Name)
+                        .ThenBy(x => x.Id);
+                }
                 else if (orderBy == "asc(hourPrice)")
-                    dtoQuery = dtoQuery.OrderBy(x => x.HourPrice);
+                {
+                    dtoQuery = dtoQuery
+                        .OrderBy(x => x.HourPrice)
+                        .ThenBy(x => x.Id);
+                }
                 else if (orderBy == "desc(hourPrice)")
-                    dtoQuery = dtoQuery.OrderByDescending(x => x.HourPrice);
+                {
+                    dtoQuery = dtoQuery
+                        .OrderByDescending(x => x.HourPrice)
+                        .ThenBy(x => x.Id);
+                }
+            }
+            else
+            {
+                dtoQuery = dtoQuery.OrderBy(x => x.Id);
             }
 
-            dtoQuery = dtoQuery.OrderBy(x => x.Id);
 
             return await dtoQuery.ToPaginatedListAsync(pagination);
         }
@@ -163,6 +182,20 @@ namespace BzRental.Application.Products.Services
                         .Where(y => y.ProductId == id && y.FieldId == x.Id)
                         .Select(x => x.BoolValue)
                         .FirstOrDefault()
+                })
+                .ToListAsync();
+        }
+
+        public async Task<Result<List<ProductFieldInfoDto>>> GetAllFieldsValuesForProductById(int id)
+        {
+            return await _ctx.ProductFieldValues
+                .Where(x => x.ProductId == id)
+                .Select(x => new ProductFieldInfoDto
+                {
+                    Id = x.FieldId,
+                    TextValue = x.TextValue,
+                    NumberValue = x.NumberValue,
+                    BoolValue = x.BoolValue
                 })
                 .ToListAsync();
         }

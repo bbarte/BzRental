@@ -66,6 +66,13 @@ namespace BzRental.Api.Controllers.Products
             return (await _service.GetFieldsInfoForProductById(id)).ToActionResult();
         }
 
+        [HttpGet("{id}/all-field-values")]
+        public async Task<ActionResult<List<ProductFieldInfoDto>>> GetAllFieldsValuesForProductById(
+            [FromRoute] int id)
+        {
+            return (await _service.GetAllFieldsValuesForProductById(id)).ToActionResult();
+        }
+
         [HttpPost]
         public async Task<ActionResult<CreatedObjectDto<int>>> AddProduct(
             [FromBody] AddProductRequest request)
