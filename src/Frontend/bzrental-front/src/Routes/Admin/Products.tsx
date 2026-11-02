@@ -255,8 +255,8 @@ export default function Products() {
                                 products.items.length > 0 &&
                                 products.items.map(prod => (
                                     <div key={prod.id} className="col-lg-4 col-md-6">
-                                        <div className="card shadow-sm">
-                                            <ImageFromApi fileName={prod.firstImageFileName} className="card-img-top"/>
+                                        <div className="card shadow-sm h-100">
+                                            <ImageFromApi fileName={prod.firstImageFileName} className="card-img-top" style={{height: '200px', objectFit: 'cover', overflowClipMargin: 'unset'}}/>
                                             <div className="card-body">
                                                 <h5 className="card-title">
                                                     {prod.name}
