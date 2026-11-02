@@ -128,8 +128,22 @@ export default function Products() {
         }
     }
 
-    function handleAddProductModalSaveEvent(request: IAddProductRequest, images: FileList | File[]) {
-        console.log(request);
+    async function handleAddProductModalSaveEvent(request: IAddProductRequest, images: FileList | File[]) {
+        setApiErrors([]);
+        setInfoMessages([]);
+
+        setIsLoading(true);
+
+        try {
+            const id = (await ProductsAdminService.addProduct(request)).id;
+            await ProductsAdminService.uploadProductImages(id, images);
+
+            setInfoMessages(['Dodano przedmiot.']);
+            await refreshData();
+        }
+        finally {
+            setIsLoading(false);
+        }
     }
 
     function handleBtnNewClick() {

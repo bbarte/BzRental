@@ -25,6 +25,8 @@ export function AddProduct({handleSave, setIsOpened}: AddProductProps) {
         fieldValues: []
     });
 
+    const [files, setFiles] = useState<File[]>([]);
+
     const [minimalCategories, setMinimalCategories] = useState<IProductCategoryMinimalDto[]>([]);
 
     useEffect(() => {
@@ -79,7 +81,7 @@ export function AddProduct({handleSave, setIsOpened}: AddProductProps) {
             return;
         }
 
-        handleSave(request, []);
+        handleSave(request, files);
 
         setIsOpened(false);
     }
@@ -126,7 +128,7 @@ export function AddProduct({handleSave, setIsOpened}: AddProductProps) {
                             </div>
                         </div>
                     </div>
-                    <div className="row">
+                    <div className="row mb-2">
                         <label htmlFor="categoryId" className="col-sm-2 col-form-label">Kategoria:</label>
                         <div className="col-sm-10">
                             <select
@@ -143,6 +145,31 @@ export function AddProduct({handleSave, setIsOpened}: AddProductProps) {
                                 }
                             </select>
                         </div>
+                    </div>
+                    <div className="row mb-2">
+                        <label htmlFor="files" className="col-sm-2 col-form-label">Zdjęcia:</label>
+                        <div className="col-sm-10">
+                            <input
+                                type="file" name="files" id="files" className="form-control" multiple accept=".jpeg,.jpg,.png,.webp"
+                                onChange={(e) => {
+                                    const selectedFiles = e.target.files;
+
+                                    if (selectedFiles) {
+                                        setFiles(Array.from(selectedFiles));
+                                    }
+                                }}/>
+                        </div>
+                    </div>
+                    <div className="row g-2 p-3">
+                        {
+                            files.map((file, idx) => (
+                                <div className="col-4" key={idx}>
+                                    <div className="card shadow-sm">
+                                        <img src={URL.createObjectURL(file)} alt="" className="card-img-top"/>
+                                    </div>
+                                </div>
+                            ))
+                        }
                     </div>
                 </div>
 
