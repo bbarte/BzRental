@@ -186,6 +186,20 @@ namespace BzRental.Application.Products.Services
                 .ToListAsync();
         }
 
+        public async Task<Result<List<ProductFieldInfoDto>>> GetAllFieldsValuesForProductById(int id)
+        {
+            return await _ctx.ProductFieldValues
+                .Where(x => x.ProductId == id)
+                .Select(x => new ProductFieldInfoDto
+                {
+                    Id = x.FieldId,
+                    TextValue = x.TextValue,
+                    NumberValue = x.NumberValue,
+                    BoolValue = x.BoolValue
+                })
+                .ToListAsync();
+        }
+
         public async Task<Result<CreatedObjectDto<int>>> AddProduct(AddProductRequest request)
         {
             var valResult = _addValidator.ValidateToBzRentalResult(request);

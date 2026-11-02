@@ -57,6 +57,14 @@ export default class ProductsAdminService {
         return data;
     }
 
+    public static async getAllFieldsValuesForProductById(productId: number): Promise<IProductFieldInfoDto[]> {
+        const {data} = await ApiClient.instance.http.get<IProductFieldInfoDto[]>(
+            `admin/products/${productId}/all-field-values`
+        );
+
+        return data;
+    }
+
     public static async addProduct(request: IAddProductRequest): Promise<ICreatedObjectDto<number>> {
         const {data} = await ApiClient.instance.http.post<ICreatedObjectDto<number>>('admin/products', request);
 

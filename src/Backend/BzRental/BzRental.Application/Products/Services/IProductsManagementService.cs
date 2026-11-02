@@ -22,6 +22,7 @@ namespace BzRental.Application.Products.Services
 
         Task<Result<List<ProductFieldInfoDto>>> GetFieldsInfoForCategory(int id);
         Task<Result<List<ProductFieldInfoDto>>> GetFieldsInfoForProductById(int id);
+        Task<Result<List<ProductFieldInfoDto>>> GetAllFieldsValuesForProductById(int id);
 
         Task<Result<CreatedObjectDto<int>>> AddProduct(AddProductRequest request);
         Task<Result> UpdateProduct(int id, UpdateProductRequest request);
