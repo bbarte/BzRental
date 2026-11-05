@@ -26,15 +26,18 @@ namespace BzRental.Application.ProductsRenting.Services
         private readonly IUserProvider _userProvider;
 
         private readonly IValidator<ConfirmProductRentingPlanHandoverRequest> _confirmRentingPlanHandoverValidator;
+        private readonly IValidator<TurnDownProductRentingPlanRequest> _turnDownRentingPlanValidator;
 
         public ProductRentingsManagementService(
             BzRentalDbContext ctx,
             IUserProvider userProvider,
-            IValidator<ConfirmProductRentingPlanHandoverRequest> confirmRentingPlanHandoverValidator)
+            IValidator<ConfirmProductRentingPlanHandoverRequest> confirmRentingPlanHandoverValidator,
+            IValidator<TurnDownProductRentingPlanRequest> turnDownRentingPlanValidator)
         {
             _ctx = ctx;
             _userProvider = userProvider;
             _confirmRentingPlanHandoverValidator = confirmRentingPlanHandoverValidator;
+            _turnDownRentingPlanValidator = turnDownRentingPlanValidator;
         }
 
         public async Task<Result<PaginatedList<ProductRentingDto>>> GetRentings(
@@ -174,6 +177,45 @@ namespace BzRental.Application.ProductsRenting.Services
             {
                 RentingId = id,
                 CurrentStatus = ProductRentingStatus.InProgress,
+                CreatedById = loggedUser.Id,
+                Comments = request.Comments
+            };
+
+            _ctx.ProductRentingStatusChanges.Add(change);
+
+            await _ctx.SaveChangesAsync();
+            return Result.Success();
+        }
+
+        public async Task<Result> TurnDownRentingPlan(
+            int id,
+            TurnDownProductRentingPlanRequest request)
+        {
+            var valResult = _turnDownRentingPlanValidator.ValidateToBzRentalResult(request);
+            if (valResult.IsFailure) return valResult;
+
+            var getUserResult = _userProvider.GetUser();
+            if (getUserResult.IsFailure) return getUserResult;
+
+            SharedUser loggedUser = getUserResult.Value;
+
+            ProductRenting? renting = await _ctx.ProductRentings
+                .Where(x => x.Id == id)
+                .FirstOrDefaultAsync();
+
+            if (renting == null)
+                return SharedErrors.NotFound;
+
+            if (renting.Status != ProductRentingStatus.Planned)
+                return ProductsRentingErrors.CantTurnDownStatus;
+
+            renting.Status = ProductRentingStatus.UserDidNotShowUp;
+            renting.DoesReserveProduct = false;
+
+            ProductRentingStatusChange change = new ProductRentingStatusChange
+            {
+                RentingId = id,
+                CurrentStatus = ProductRentingStatus.UserDidNotShowUp,
                 CreatedById = loggedUser.Id,
                 Comments = request.Comments
             };

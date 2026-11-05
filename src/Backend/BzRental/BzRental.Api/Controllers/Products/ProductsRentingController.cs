@@ -64,5 +64,13 @@ namespace BzRental.Api.Controllers.Products
         {
             return (await _rentManagementService.ConfirmRentingPlanHandover(id, request)).ToActionResult();
         }
+
+        [HttpPost("rentings/{id}/turn-down-renting-plan")]
+        public async Task<IActionResult> TurnDownRentingPlan(
+            [FromRoute] int id,
+            [FromBody] TurnDownProductRentingPlanRequest request)
+        {
+            return (await _rentManagementService.TurnDownRentingPlan(id, request)).ToActionResult();
+        }
     }
 }

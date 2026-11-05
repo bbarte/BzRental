@@ -25,5 +25,9 @@ namespace BzRental.Application.ProductsRenting.Services
         Task<Result> ConfirmRentingPlanHandover(
             int id,
             ConfirmProductRentingPlanHandoverRequest request);
+
+        Task<Result> TurnDownRentingPlan(
+            int id,
+            TurnDownProductRentingPlanRequest request);
     }
 }

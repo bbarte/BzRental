@@ -21,5 +21,8 @@ namespace BzRental.Application.ProductsRenting.Errors
         
         public static readonly Error CantConfirmHandoverExpired = new Error(
             "ProductsRenting.CantConfirmHandover.Expired", "Cannot handover this product, because its date frames are in the past.", FailureType.BadRequest);
+
+        public static readonly Error CantTurnDownStatus = new Error(
+            "ProductsRenting.CantTurnDown.Status", "Cannot turn down this renting plan, because it's not marked as planned.", FailureType.BadRequest);
     }
 }
