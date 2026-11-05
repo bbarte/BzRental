@@ -18,7 +18,7 @@ namespace BzRental.Configuration.Products
                 .HasMaxLength(2048);
 
             builder.HasIndex(x => x.Name);
-            builder.HasIndex(x => x.HourPrice);
+            builder.HasIndex(x => x.DailyPrice);
             builder.HasIndex(x => x.Rating);
         }
     }

@@ -2,6 +2,7 @@ using BzRental.Api.Abstraction;
 using BzRental.Api.Auth;
 using BzRental.Api.Handlers;
 using BzRental.Application.Products;
+using BzRental.Application.ProductsRenting;
 using BzRental.Application.Users;
 using BzRental.Application.Users.Services;
 using BzRental.DbAccess.Contexts;
@@ -49,7 +50,8 @@ namespace BzRental.Api
 
             builder.Services
                 .AddUserServices()
-                .AddProductServices();
+                .AddProductServices()
+                .AddProductsRentingServices();
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>

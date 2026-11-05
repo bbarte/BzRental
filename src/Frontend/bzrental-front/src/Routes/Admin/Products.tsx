@@ -244,8 +244,8 @@ export default function Products() {
                                                 <option value="">(brak sortowania)</option>
                                                 <option value="asc(name)">Nazwa: rosnąco</option>
                                                 <option value="desc(name)">Nazwa: malejąco</option>
-                                                <option value="asc(hourPrice)">Cena za godzinę: rosnąco</option>
-                                                <option value="desc(hourPrice)">Cena za godzinę: malejąco</option>
+                                                <option value="asc(dailyPrice)">Cena za dzień: rosnąco</option>
+                                                <option value="desc(dailyPrice)">Cena za dzień: malejąco</option>
                                             </select>
                                         </div>
                                     </div>
@@ -289,7 +289,7 @@ export default function Products() {
                                                     {prod.name}
                                                 </h5>
                                                 <div className="card-text">
-                                                    <h6>{prod.hourPrice} zł/godz</h6>
+                                                    <h6>{prod.dailyPrice} zł/dzień</h6>
                                                     <span className="badge border border-primary text-primary">{prod.categoryName}</span>
                                                     {
                                                         prod.isDeleted &&

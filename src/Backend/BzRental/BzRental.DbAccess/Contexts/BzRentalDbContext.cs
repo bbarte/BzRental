@@ -1,4 +1,5 @@
 ﻿using BzRental.Configuration.Products;
+using BzRental.Configuration.ProductsRenting;
 using BzRental.Configuration.Users;
 using BzRental.Shared.Models;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +21,8 @@ namespace BzRental.DbAccess.Contexts
         {
             modelBuilder
                 .ConfigureUsers()
-                .ConfigureProducts();
+                .ConfigureProducts()
+                .ConfigureProductRenting();
 
             base.OnModelCreating(modelBuilder);
         }
