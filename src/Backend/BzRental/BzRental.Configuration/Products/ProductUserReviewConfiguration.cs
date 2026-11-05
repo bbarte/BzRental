@@ -14,6 +14,8 @@ namespace BzRental.Configuration.Products
             builder.Property(x => x.Content)
                 .HasMaxLength(1024);
 
+            builder.HasIndex(x => x.Rating);
+
             builder
                 .HasOne(x => x.Product)
                 .WithMany(x => x.UserReviews)

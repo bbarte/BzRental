@@ -192,6 +192,8 @@ namespace BzRental.DbAccess.Migrations
 
                     b.HasIndex("ProductId");
 
+                    b.HasIndex("Rating");
+
                     b.ToTable("ProductUserReviews");
                 });
 
