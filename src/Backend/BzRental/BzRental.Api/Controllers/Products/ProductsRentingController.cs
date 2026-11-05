@@ -29,7 +29,7 @@ namespace BzRental.Api.Controllers.Products
         }
 
         [HttpGet("rentings/users")]
-        public async Task<ActionResult<PaginatedList<UsersProductRentingDto>> GetUsersRentings(
+        public async Task<ActionResult<PaginatedList<UsersProductRentingDto>>> GetUsersRentings(
             [FromQuery] PaginationParameters pagination,
             [FromQuery] GetRentingsStatusFilter? status = null,
             [FromQuery] DateTime? dateFrom = null,
