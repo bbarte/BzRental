@@ -25,5 +25,7 @@ namespace BzRental.Application.ProductsRenting.Dtos
 
         public decimal DailyPrice { get; set; } = 0m;
         public decimal CurrentRentValue { get; set; } = 0m;
+
+        public string UserComments { get; set; } = string.Empty;
     }
 }

@@ -80,7 +80,8 @@ namespace BzRental.Application.ProductsRenting.Services
                     EndDate = x.EndDate,
                     DailyPrice = x.DailyPrice ?? 0m,
                     CurrentRentValue = (EF.Functions.DateDiffDay(x.StartDate, x.EndDate) + 1) * x.DailyPrice!.Value,
-                    CreatedAt = x.CreatedAt
+                    CreatedAt = x.CreatedAt,
+                    UserComments = x.UserComments
                 });
 
             if (!string.IsNullOrWhiteSpace(orderBy))
