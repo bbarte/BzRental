@@ -36,14 +36,14 @@ namespace BzRental.DbAccess.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime");
 
+                    b.Property<decimal>("DailyPrice")
+                        .HasPrecision(19, 2)
+                        .HasColumnType("decimal(19,2)");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(2048)
                         .HasColumnType("varchar");
-
-                    b.Property<decimal>("HourPrice")
-                        .HasPrecision(19, 2)
-                        .HasColumnType("decimal(19,2)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -60,7 +60,7 @@ namespace BzRental.DbAccess.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("HourPrice");
+                    b.HasIndex("DailyPrice");
 
                     b.HasIndex("Name");
 
@@ -256,15 +256,15 @@ namespace BzRental.DbAccess.Migrations
                     b.Property<int>("CreatedById")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("DailyPrice")
+                        .HasPrecision(19, 2)
+                        .HasColumnType("decimal(19,2)");
+
                     b.Property<bool>("DoesReserveProduct")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime");
-
-                    b.Property<decimal>("HourPrice")
-                        .HasPrecision(19, 2)
-                        .HasColumnType("decimal(19,2)");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
