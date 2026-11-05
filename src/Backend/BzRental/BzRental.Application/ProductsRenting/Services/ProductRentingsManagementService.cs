@@ -1,12 +1,18 @@
 ﻿using BzRental.Application.ProductsRenting.Dtos;
+using BzRental.Application.ProductsRenting.Errors;
 using BzRental.Application.ProductsRenting.QueryParams;
+using BzRental.Application.ProductsRenting.Requests;
 using BzRental.DbAccess.Contexts;
 using BzRental.DbAccess.Extensions;
 using BzRental.Domain.ProductsRenting.Enums;
 using BzRental.Domain.ProductsRenting.Models;
+using BzRental.Shared.Abstraction;
 using BzRental.Shared.Contracts.Dtos;
+using BzRental.Shared.Errors;
+using BzRental.Shared.Extensions;
 using BzRental.Shared.Pagination;
 using BzRental.Shared.ResultPattern;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -17,10 +23,18 @@ namespace BzRental.Application.ProductsRenting.Services
     public class ProductRentingsManagementService : IProductRentingsManagementService
     {
         private readonly BzRentalDbContext _ctx;
+        private readonly IUserProvider _userProvider;
 
-        public ProductRentingsManagementService(BzRentalDbContext ctx)
+        private readonly IValidator<ConfirmProductRentingPlanHandoverRequest> _confirmRentingPlanHandoverValidator;
+
+        public ProductRentingsManagementService(
+            BzRentalDbContext ctx,
+            IUserProvider userProvider,
+            IValidator<ConfirmProductRentingPlanHandoverRequest> confirmRentingPlanHandoverValidator)
         {
             _ctx = ctx;
+            _userProvider = userProvider;
+            _confirmRentingPlanHandoverValidator = confirmRentingPlanHandoverValidator;
         }
 
         public async Task<Result<PaginatedList<ProductRentingDto>>> GetRentings(
@@ -126,6 +140,46 @@ namespace BzRental.Application.ProductsRenting.Services
             }
 
             return await dtoQuery.ToPaginatedListAsync(pagination);
+        }
+
+        public async Task<Result> ConfirmRentingPlanHandover(int rentingId, ConfirmProductRentingPlanHandoverRequest request)
+        {
+            var valResult = _confirmRentingPlanHandoverValidator.ValidateToBzRentalResult(request);
+            if (valResult.IsFailure) return valResult;
+
+            var getUserResult = _userProvider.GetUser();
+            if (getUserResult.IsFailure) return getUserResult;
+
+            SharedUser loggedUser = getUserResult.Value;
+
+            ProductRenting? renting = await _ctx.ProductRentings
+                .Where(x => x.Id == rentingId)
+                .FirstOrDefaultAsync();
+
+            if (renting == null)
+                return SharedErrors.NotFound;
+
+            if (renting.Status != ProductRentingStatus.Planned)
+                return ProductsRentingErrors.CantConfirmHandoverStatus;
+
+            if (DateTime.Now.Date > renting.EndDate.Date)
+                return ProductsRentingErrors.CantConfirmHandoverExpired;
+
+            renting.Status = ProductRentingStatus.InProgress;
+            renting.DoesReserveProduct = true;
+
+            ProductRentingStatusChange change = new ProductRentingStatusChange
+            {
+                RentingId = rentingId,
+                CurrentStatus = ProductRentingStatus.InProgress,
+                CreatedById = loggedUser.Id,
+                Comments = request.Comments
+            };
+
+            _ctx.ProductRentingStatusChanges.Add(change);
+
+            await _ctx.SaveChangesAsync();
+            return Result.Success();
         }
     }
 }

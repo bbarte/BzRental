@@ -17,6 +17,8 @@ namespace BzRental.Application.ProductsRenting
             services.AddScoped<IValidator<PlanProductRentingRequest>, PlanProductRentingValidator>();
             services.AddScoped<IValidator<CancelProductRentingRequest>, CancelProductRentingValidator>();
 
+            services.AddScoped<IValidator<ConfirmProductRentingPlanHandoverRequest>, ConfirmProductRentingPlanHandoverValidator>();
+
             services.AddScoped<IProductsRentPlanningService, ProductsRentPlanningService>();
             services.AddScoped<IProductsManagementService, ProductsManagementService>();
 

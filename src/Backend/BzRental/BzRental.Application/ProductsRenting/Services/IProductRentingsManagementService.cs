@@ -1,5 +1,6 @@
 ﻿using BzRental.Application.ProductsRenting.Dtos;
 using BzRental.Application.ProductsRenting.QueryParams;
+using BzRental.Application.ProductsRenting.Requests;
 using BzRental.Domain.ProductsRenting.Enums;
 using BzRental.Shared.Contracts.Dtos;
 using BzRental.Shared.Pagination;
@@ -20,5 +21,9 @@ namespace BzRental.Application.ProductsRenting.Services
             DateTime? dateFrom = null,
             DateTime? dateTo = null,
             string? orderBy = null);
+
+        Task<Result> ConfirmRentingPlanHandover(
+            int rentingId,
+            ConfirmProductRentingPlanHandoverRequest request);
     }
 }
