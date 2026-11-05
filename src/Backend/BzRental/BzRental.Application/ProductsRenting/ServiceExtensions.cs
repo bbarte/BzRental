@@ -1,4 +1,5 @@
-﻿using BzRental.Application.ProductsRenting.Requests;
+﻿using BzRental.Application.Products.Services;
+using BzRental.Application.ProductsRenting.Requests;
 using BzRental.Application.ProductsRenting.Services;
 using BzRental.Application.ProductsRenting.Validators;
 using FluentValidation;
@@ -17,6 +18,7 @@ namespace BzRental.Application.ProductsRenting
             services.AddScoped<IValidator<CancelProductRentingRequest>, CancelProductRentingValidator>();
 
             services.AddScoped<IProductsRentPlanningService, ProductsRentPlanningService>();
+            services.AddScoped<IProductsManagementService, ProductsManagementService>();
 
             return services;
         }
