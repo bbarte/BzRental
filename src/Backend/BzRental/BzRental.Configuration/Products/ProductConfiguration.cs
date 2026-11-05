@@ -19,6 +19,7 @@ namespace BzRental.Configuration.Products
 
             builder.HasIndex(x => x.Name);
             builder.HasIndex(x => x.HourPrice);
+            builder.HasIndex(x => x.Rating);
         }
     }
 }
