@@ -36,7 +36,7 @@ namespace BzRental.Api.Controllers.Products
             return (await _rentPlanningService.PlanRenting(productId, request)).ToActionResult();
         }
 
-        [HttpPost("rents/{id}/cancel-renting-plan")]
+        [HttpPost("rentings/{id}/cancel-renting-plan")]
         public async Task<IActionResult> CancelRentingPlan(
             [FromRoute] int id,
             [FromBody] CancelProductRentingRequest request)
@@ -55,6 +55,14 @@ namespace BzRental.Api.Controllers.Products
             [FromQuery] string? orderBy = null)
         {
             return (await _rentManagementService.GetRentings(pagination, productId, createdById, status, dateFrom, dateTo, orderBy)).ToActionResult();
+        }
+
+        [HttpPost("rentings/{id}/confirm-renting-plan-handover"), Authorize(Roles = AuthRoles.Admin)]
+        public async Task<IActionResult> ConfirmRentingPlanHandover(
+            [FromRoute] int id,
+            [FromBody] ConfirmProductRentingPlanHandoverRequest request)
+        {
+            return (await _rentManagementService.ConfirmRentingPlanHandover(id, request)).ToActionResult();
         }
     }
 }

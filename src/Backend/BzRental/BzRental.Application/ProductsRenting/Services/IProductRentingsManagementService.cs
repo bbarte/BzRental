@@ -23,7 +23,7 @@ namespace BzRental.Application.ProductsRenting.Services
             string? orderBy = null);
 
         Task<Result> ConfirmRentingPlanHandover(
-            int rentingId,
+            int id,
             ConfirmProductRentingPlanHandoverRequest request);
     }
 }

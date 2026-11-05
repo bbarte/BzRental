@@ -142,7 +142,9 @@ namespace BzRental.Application.ProductsRenting.Services
             return await dtoQuery.ToPaginatedListAsync(pagination);
         }
 
-        public async Task<Result> ConfirmRentingPlanHandover(int rentingId, ConfirmProductRentingPlanHandoverRequest request)
+        public async Task<Result> ConfirmRentingPlanHandover(
+            int id,
+            ConfirmProductRentingPlanHandoverRequest request)
         {
             var valResult = _confirmRentingPlanHandoverValidator.ValidateToBzRentalResult(request);
             if (valResult.IsFailure) return valResult;
@@ -153,7 +155,7 @@ namespace BzRental.Application.ProductsRenting.Services
             SharedUser loggedUser = getUserResult.Value;
 
             ProductRenting? renting = await _ctx.ProductRentings
-                .Where(x => x.Id == rentingId)
+                .Where(x => x.Id == id)
                 .FirstOrDefaultAsync();
 
             if (renting == null)
@@ -170,7 +172,7 @@ namespace BzRental.Application.ProductsRenting.Services
 
             ProductRentingStatusChange change = new ProductRentingStatusChange
             {
-                RentingId = rentingId,
+                RentingId = id,
                 CurrentStatus = ProductRentingStatus.InProgress,
                 CreatedById = loggedUser.Id,
                 Comments = request.Comments
