@@ -22,7 +22,7 @@ namespace BzRental.Domain.ProductsRenting.Models
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
 
-        public decimal DailyPrice { get; set; } = 0m;
+        public decimal? DailyPrice { get; set; }
         public List<ProductRentingStatusChange> StatusChanges { get; set; } = new();
 
         public string UserComments { get; set; } = string.Empty;

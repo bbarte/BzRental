@@ -256,7 +256,7 @@ namespace BzRental.DbAccess.Migrations
                     b.Property<int>("CreatedById")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("DailyPrice")
+                    b.Property<decimal?>("DailyPrice")
                         .HasPrecision(19, 2)
                         .HasColumnType("decimal(19,2)");
 
