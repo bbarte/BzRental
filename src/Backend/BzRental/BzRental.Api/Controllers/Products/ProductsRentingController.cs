@@ -72,5 +72,13 @@ namespace BzRental.Api.Controllers.Products
         {
             return (await _rentManagementService.TurnDownRentingPlan(id, request)).ToActionResult();
         }
+
+        [HttpPost("rentings/{id}/checkout-renting"), Authorize(Roles = AuthRoles.Admin)]
+        public async Task<ActionResult<CheckoutRentingSummaryDto>> CheckoutRenting(
+            [FromRoute] int id,
+            [FromBody] CheckoutProductRentingRequest requset)
+        {
+            return (await _rentManagementService.CheckoutRenting(id, requset)).ToActionResult();
+        }
     }
 }
