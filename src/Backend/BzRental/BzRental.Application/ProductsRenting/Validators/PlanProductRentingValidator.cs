@@ -12,6 +12,9 @@ namespace BzRental.Application.ProductsRenting.Validators
         {
             RuleFor(x => x.UserComments)
                 .MaximumLength(512);
+
+            RuleFor(x => x.EndDate)
+                .GreaterThan(x => x.StartDate);
         }
     }
 }
