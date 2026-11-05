@@ -28,6 +28,17 @@ namespace BzRental.Api.Controllers.Products
             _rentManagementService = rentManagementService;
         }
 
+        [HttpGet("rentings/users")]
+        public async Task<ActionResult<PaginatedList<UsersProductRentingDto>> GetUsersRentings(
+            [FromQuery] PaginationParameters pagination,
+            [FromQuery] GetRentingsStatusFilter? status = null,
+            [FromQuery] DateTime? dateFrom = null,
+            [FromQuery] DateTime? dateTo = null,
+            [FromQuery] string? orderBy = null)
+        {
+            return (await _rentPlanningService.GetUsersRentings(pagination, status, dateFrom, dateTo, orderBy)).ToActionResult();
+        }
+
         [HttpPost("{productId}/plan-renting")]
         public async Task<ActionResult<CreatedObjectDto<int>>> PlanRenting(
             [FromRoute] int productId,
@@ -44,7 +55,7 @@ namespace BzRental.Api.Controllers.Products
             return (await _rentPlanningService.CancelRentingPlan(id, request)).ToActionResult();
         }
 
-        [HttpGet("rentings"), Authorize(Roles = AuthRoles.Admin)]
+        [HttpGet("rentings/all"), Authorize(Roles = AuthRoles.Admin)]
         public async Task<ActionResult<PaginatedList<ProductRentingDto>>> GetRentings(
             [FromQuery] PaginationParameters pagination,
             [FromQuery] int? productId = null,
