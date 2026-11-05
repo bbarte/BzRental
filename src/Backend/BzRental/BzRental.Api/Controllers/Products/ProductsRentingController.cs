@@ -1,7 +1,12 @@
 ﻿using BzRental.Api.Extensions;
+using BzRental.Application.Products.Services;
+using BzRental.Application.ProductsRenting.Dtos;
+using BzRental.Application.ProductsRenting.QueryParams;
 using BzRental.Application.ProductsRenting.Requests;
 using BzRental.Application.ProductsRenting.Services;
+using BzRental.Application.Users;
 using BzRental.Shared.Contracts.Dtos;
+using BzRental.Shared.Pagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,10 +18,14 @@ namespace BzRental.Api.Controllers.Products
     public class ProductsRentingController : ControllerBase
     {
         private readonly IProductsRentPlanningService _rentPlanningService;
+        private readonly IProductRentingsManagementService _rentManagementService;
 
-        public ProductsRentingController(IProductsRentPlanningService rentPlanningService)
+        public ProductsRentingController(
+            IProductsRentPlanningService rentPlanningService,
+            IProductRentingsManagementService rentManagementService)
         {
             _rentPlanningService = rentPlanningService;
+            _rentManagementService = rentManagementService;
         }
 
         [HttpPost("{productId}/plan-renting")]
@@ -33,6 +42,19 @@ namespace BzRental.Api.Controllers.Products
             [FromBody] CancelProductRentingRequest request)
         {
             return (await _rentPlanningService.CancelRentingPlan(id, request)).ToActionResult();
+        }
+
+        [HttpGet("rentings"), Authorize(Roles = AuthRoles.Admin)]
+        public async Task<ActionResult<PaginatedList<ProductRentingDto>>> GetRentings(
+            [FromQuery] PaginationParameters pagination,
+            [FromQuery] int? productId = null,
+            [FromQuery] int? createdById = null,
+            [FromQuery] GetRentingsStatusFilter? status = null,
+            [FromQuery] DateTime? dateFrom = null,
+            [FromQuery] DateTime? dateTo = null,
+            [FromQuery] string? orderBy = null)
+        {
+            return (await _rentManagementService.GetRentings(pagination, productId, createdById, status, dateFrom, dateTo, orderBy)).ToActionResult();
         }
     }
 }
