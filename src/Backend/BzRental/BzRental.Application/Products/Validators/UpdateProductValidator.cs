@@ -17,7 +17,7 @@ namespace BzRental.Application.Products.Validators
             RuleFor(x => x.Description)
                 .MaximumLength(2048);
 
-            RuleFor(x => x.HourPrice)
+            RuleFor(x => x.DailyPrice)
                 .NotEmpty()
                 .GreaterThan(0);
 

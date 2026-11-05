@@ -62,7 +62,7 @@ namespace BzRental.Application.Products.Services
                     Id = x.Id,
                     Name = x.Name,
                     Description = x.Description,
-                    HourPrice = x.HourPrice,
+                    DailyPrice = x.DailyPrice,
                     CategoryId = x.CategoryId,
                     CategoryName = x.Category.Name,
                     IsDeleted = x.IsDeleted,
@@ -86,16 +86,16 @@ namespace BzRental.Application.Products.Services
                         .OrderByDescending(x => x.Name)
                         .ThenBy(x => x.Id);
                 }
-                else if (orderBy == "asc(hourPrice)")
+                else if (orderBy == "asc(dailyPrice)")
                 {
                     dtoQuery = dtoQuery
-                        .OrderBy(x => x.HourPrice)
+                        .OrderBy(x => x.DailyPrice)
                         .ThenBy(x => x.Id);
                 }
-                else if (orderBy == "desc(hourPrice)")
+                else if (orderBy == "desc(dailyPrice)")
                 {
                     dtoQuery = dtoQuery
-                        .OrderByDescending(x => x.HourPrice)
+                        .OrderByDescending(x => x.DailyPrice)
                         .ThenBy(x => x.Id);
                 }
             }
@@ -117,7 +117,7 @@ namespace BzRental.Application.Products.Services
                     Id = x.Id,
                     Name = x.Name,
                     Description = x.Description,
-                    HourPrice = x.HourPrice,
+                    DailyPrice = x.DailyPrice,
                     CategoryId = x.CategoryId,
                     IsDeleted = x.IsDeleted,
                     CreatedAt = x.CreatedAt
@@ -218,7 +218,7 @@ namespace BzRental.Application.Products.Services
             {
                 Name = request.Name,
                 Description = request.Description,
-                HourPrice = request.HourPrice,
+                DailyPrice = request.DailyPrice,
                 CategoryId = request.CategoryId
             };
 
@@ -279,7 +279,7 @@ namespace BzRental.Application.Products.Services
 
             prod.Name = request.Name;
             prod.Description = request.Description;
-            prod.HourPrice = request.HourPrice;
+            prod.DailyPrice = request.DailyPrice;
             prod.CategoryId = request.CategoryId;
 
             if (request.UpdateFieldValues && request.FieldValues != null)
