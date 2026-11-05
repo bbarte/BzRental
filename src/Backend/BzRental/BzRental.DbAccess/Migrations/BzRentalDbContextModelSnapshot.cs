@@ -242,6 +242,87 @@ namespace BzRental.DbAccess.Migrations
                     b.ToTable("ProductsCategoryFields");
                 });
 
+            modelBuilder.Entity("BzRental.Domain.ProductsRenting.Models.ProductRenting", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("DoesReserveProduct")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<decimal>("HourPrice")
+                        .HasPrecision(19, 2)
+                        .HasColumnType("decimal(19,2)");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserComments")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("varchar");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("ProductRentings");
+                });
+
+            modelBuilder.Entity("BzRental.Domain.ProductsRenting.Models.ProductRentingStatusChange", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Comments")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("varchar");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime");
+
+                    b.Property<int>("CreatedById")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CurrentStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RentingId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("RentingId");
+
+                    b.ToTable("ProductRentingStatusChanges");
+                });
+
             modelBuilder.Entity("BzRental.Domain.Users.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -361,6 +442,44 @@ namespace BzRental.DbAccess.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("BzRental.Domain.ProductsRenting.Models.ProductRenting", b =>
+                {
+                    b.HasOne("BzRental.Domain.Users.Models.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("BzRental.Domain.Products.Models.Product", "Product")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("BzRental.Domain.ProductsRenting.Models.ProductRentingStatusChange", b =>
+                {
+                    b.HasOne("BzRental.Domain.Users.Models.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("BzRental.Domain.ProductsRenting.Models.ProductRenting", "Renting")
+                        .WithMany("StatusChanges")
+                        .HasForeignKey("RentingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Renting");
+                });
+
             modelBuilder.Entity("BzRental.Domain.Products.Models.Product", b =>
                 {
                     b.Navigation("FieldValues");
@@ -373,6 +492,11 @@ namespace BzRental.DbAccess.Migrations
             modelBuilder.Entity("BzRental.Domain.Products.Models.ProductCategory", b =>
                 {
                     b.Navigation("Fields");
+                });
+
+            modelBuilder.Entity("BzRental.Domain.ProductsRenting.Models.ProductRenting", b =>
+                {
+                    b.Navigation("StatusChanges");
                 });
 #pragma warning restore 612, 618
         }

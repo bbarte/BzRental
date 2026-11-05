@@ -1,4 +1,5 @@
 ﻿using BzRental.Domain.Products.Models;
+using BzRental.Domain.ProductsRenting.Models;
 using BzRental.Domain.Users.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -18,5 +19,8 @@ namespace BzRental.DbAccess.Contexts
         public DbSet<ProductFieldValue> ProductFieldValues { get; set; }
         public DbSet<ProductImage> ProductImages { get; set; }
         public DbSet<ProductUserReview> ProductUserReviews { get; set; }
+
+        public DbSet<ProductRenting> ProductRentings { get; set; }
+        public DbSet<ProductRentingStatusChange> ProductRentingStatusChanges { get; set; }
     }
 }
