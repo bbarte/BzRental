@@ -1,4 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using BzRental.Application.ProductsRenting.Requests;
+using BzRental.Application.ProductsRenting.Services;
+using BzRental.Application.ProductsRenting.Validators;
+using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,6 +13,11 @@ namespace BzRental.Application.ProductsRenting
     {
         public static IServiceCollection AddProductsRentingServices(this IServiceCollection services)
         {
+            services.AddScoped<IValidator<PlanProductRentingRequest>, PlanProductRentingValidator>();
+            services.AddScoped<IValidator<CancelProductRentingRequest>, CancelProductRentingValidator>();
+
+            services.AddScoped<IProductsRentPlanningService, ProductsRentPlanningService>();
+
             return services;
         }
     }
