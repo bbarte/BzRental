@@ -180,6 +180,9 @@ namespace BzRental.DbAccess.Migrations
                     b.Property<int>("CreatedById")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime");
+
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
