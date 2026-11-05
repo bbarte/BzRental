@@ -27,17 +27,20 @@ namespace BzRental.Application.ProductsRenting.Services
 
         private readonly IValidator<ConfirmProductRentingPlanHandoverRequest> _confirmRentingPlanHandoverValidator;
         private readonly IValidator<TurnDownProductRentingPlanRequest> _turnDownRentingPlanValidator;
+        private readonly IValidator<CheckoutProductRentingRequest> _checkoutRentingValidator;
 
         public ProductRentingsManagementService(
             BzRentalDbContext ctx,
             IUserProvider userProvider,
             IValidator<ConfirmProductRentingPlanHandoverRequest> confirmRentingPlanHandoverValidator,
-            IValidator<TurnDownProductRentingPlanRequest> turnDownRentingPlanValidator)
+            IValidator<TurnDownProductRentingPlanRequest> turnDownRentingPlanValidator,
+            IValidator<CheckoutProductRentingRequest> checkoutRentingValidator)
         {
             _ctx = ctx;
             _userProvider = userProvider;
             _confirmRentingPlanHandoverValidator = confirmRentingPlanHandoverValidator;
             _turnDownRentingPlanValidator = turnDownRentingPlanValidator;
+            _checkoutRentingValidator = checkoutRentingValidator;
         }
 
         public async Task<Result<PaginatedList<ProductRentingDto>>> GetRentings(
@@ -224,6 +227,81 @@ namespace BzRental.Application.ProductsRenting.Services
 
             await _ctx.SaveChangesAsync();
             return Result.Success();
+        }
+
+        public async Task<Result<CheckoutRentingSummaryDto>> CheckoutRenting(int id, CheckoutProductRentingRequest request)
+        {
+            var valResult = _checkoutRentingValidator.ValidateToBzRentalResult(request);
+            if (valResult.IsFailure) return valResult;
+
+            var getUserResult = _userProvider.GetUser();
+            if (getUserResult.IsFailure) return getUserResult.FailedCast<CheckoutRentingSummaryDto>();
+
+            SharedUser loggedUser = getUserResult.Value;
+
+            ProductRenting? renting = await _ctx.ProductRentings
+                .Where(x => x.Id == id)
+                .FirstOrDefaultAsync();
+
+            if (renting == null)
+                return SharedErrors.NotFound;
+
+            if (renting.Status != ProductRentingStatus.InProgress)
+                return ProductsRentingErrors.CantCheckoutStatus;
+
+            renting.Status = ProductRentingStatus.Returned;
+            renting.DoesReserveProduct = false;
+
+            ProductRentingStatusChange change = new ProductRentingStatusChange
+            {
+                RentingId = id,
+                CurrentStatus = ProductRentingStatus.Returned,
+                CreatedById = loggedUser.Id,
+                Comments = request.Comments
+            };
+
+            _ctx.ProductRentingStatusChanges.Add(change);
+
+            await _ctx.SaveChangesAsync();
+
+            var rentingInfo = await _ctx.ProductRentings
+                .Where(x => x.Id == id)
+                .Select(x => new
+                {
+                    CreatedBy = $"{x.CreatedBy.FirstName} {x.CreatedBy.LastName}",
+                    x.CreatedById,
+
+                    ProductName = x.Product.Name,
+                    ProductCategoryName = x.Product.Category.Name,
+                    x.ProductId,
+
+                    ActualStartDate = x.StatusChanges
+                        .Where(x => x.CurrentStatus == ProductRentingStatus.InProgress)
+                        .Select(x => x.CreatedAt)
+                        .First()
+                })
+                .FirstAsync();
+
+            CheckoutRentingSummaryDto dto = new CheckoutRentingSummaryDto
+            {
+                CreatedById = rentingInfo.CreatedById,
+                CreatedBy = rentingInfo.CreatedBy,
+                ProductId = rentingInfo.ProductId,
+                ProductName = rentingInfo.ProductName,
+                ProductCategoryName = rentingInfo.ProductCategoryName,
+
+                PlannedStartDate = renting.StartDate,
+                ActualStartDate = rentingInfo.ActualStartDate,
+
+                PlannedEndDate = renting.EndDate,
+                ActualEndDate = DateTime.Now,
+
+                DailyPrice = renting.DailyPrice ?? 0m
+            };
+
+            dto.TotalValue = ((dto.ActualEndDate.Date - dto.ActualStartDate.Date).Days + 1) * dto.DailyPrice;
+
+            return dto;
         }
     }
 }

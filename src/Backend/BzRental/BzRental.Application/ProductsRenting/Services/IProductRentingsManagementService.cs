@@ -29,5 +29,9 @@ namespace BzRental.Application.ProductsRenting.Services
         Task<Result> TurnDownRentingPlan(
             int id,
             TurnDownProductRentingPlanRequest request);
+
+        Task<Result<CheckoutRentingSummaryDto>> CheckoutRenting(
+            int id,
+            CheckoutProductRentingRequest request);
     }
 }

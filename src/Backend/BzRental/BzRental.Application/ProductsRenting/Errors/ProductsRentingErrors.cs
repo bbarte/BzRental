@@ -24,5 +24,8 @@ namespace BzRental.Application.ProductsRenting.Errors
 
         public static readonly Error CantTurnDownStatus = new Error(
             "ProductsRenting.CantTurnDown.Status", "Cannot turn down this renting plan, because it's not marked as planned.", FailureType.BadRequest);
+        
+        public static readonly Error CantCheckoutStatus = new Error(
+            "ProductsRenting.CantCheckout.Status", "Cannot check out this renting, because it's not marked as in progress.", FailureType.BadRequest);
     }
 }
