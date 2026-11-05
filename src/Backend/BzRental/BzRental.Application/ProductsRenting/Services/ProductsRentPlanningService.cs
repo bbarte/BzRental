@@ -73,6 +73,17 @@ namespace BzRental.Application.ProductsRenting.Services
             if (!isAvailable)
                 return ProductsRentingErrors.NotAvailable;
 
+            var productInfo = await _ctx.Products
+                .Where(x => x.Id == productId && !x.IsDeleted)
+                .Select(x => new
+                {
+                    x.DailyPrice
+                })
+                .FirstOrDefaultAsync();
+
+            if (productInfo == null)
+                return SharedErrors.NotFound;
+
             ProductRenting renting = new ProductRenting
             {
                 ProductId = productId,
@@ -82,6 +93,7 @@ namespace BzRental.Application.ProductsRenting.Services
                 StartDate = request.StartDate,
                 EndDate = request.EndDate,
                 UserComments = request.UserComments,
+                DailyPrice = productInfo.DailyPrice,
                 StatusChanges = new List<ProductRentingStatusChange>
                 {
                     new ProductRentingStatusChange
