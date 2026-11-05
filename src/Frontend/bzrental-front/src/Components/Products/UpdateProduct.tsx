@@ -23,7 +23,7 @@ export function UpdateProduct({productId, handleSave, setIsOpened}: UpdateProduc
     const [request, setRequest] = useState<IUpdateProductRequest>({
        name: '',
        description: '',
-       hourPrice: 20,
+       dailyPrice: 20,
        categoryId: 0,
        fieldValues: [],
        updateFieldValues: true 
@@ -84,7 +84,7 @@ export function UpdateProduct({productId, handleSave, setIsOpened}: UpdateProduc
             setRequest({
                 name: product.name,
                 description: product.description,
-                hourPrice: product.hourPrice,
+                dailyPrice: product.dailyPrice,
                 categoryId: product.categoryId,
                 updateFieldValues: true,
                 fieldValues: fieldValues
@@ -126,8 +126,8 @@ export function UpdateProduct({productId, handleSave, setIsOpened}: UpdateProduc
             return;
         }
 
-        if (request.hourPrice <= 0) {
-            setApiErrors(['Cena za godzinę nie może być ujemna ani zerowa']);
+        if (request.dailyPrice <= 0) {
+            setApiErrors(['Cena za dzień nie może być ujemna ani zerowa']);
             return;
         }
 
@@ -165,14 +165,14 @@ export function UpdateProduct({productId, handleSave, setIsOpened}: UpdateProduc
                             </div>
                         </div>
                         <div className="row mb-2">
-                            <label htmlFor="hourPrice" className="col-sm-2 col-form-label">Cena za godzinę:</label>
+                            <label htmlFor="hourPrice" className="col-sm-2 col-form-label">Cena za dzień:</label>
                             <div className="col-sm-10">
                                 <div className="input-group">
                                     <input
                                         type="number" name="hourPrice" id="hourPrice" className="form-control"
-                                        step={0.01} value={request.hourPrice} onChange={(e) => setRequest({
+                                        step={0.01} value={request.dailyPrice} onChange={(e) => setRequest({
                                             ...request,
-                                            hourPrice: +e.target.value
+                                            dailyPrice: +e.target.value
                                         })}/>
                                     <div className="input-group-text">zł</div>
                                 </div>
