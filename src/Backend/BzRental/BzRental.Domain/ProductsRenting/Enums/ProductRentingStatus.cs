@@ -10,7 +10,6 @@ namespace BzRental.Domain.ProductsRenting.Enums
         InProgress,
         Returned,
         Canceled,
-        UserDidNotShowUp,
-        Overdue
+        UserDidNotShowUp
     }
 }
