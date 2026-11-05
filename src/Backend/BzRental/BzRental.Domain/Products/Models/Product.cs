@@ -18,6 +18,8 @@ namespace BzRental.Domain.Products.Models
         public List<ProductImage> Images { get; set; } = new();
         public List<ProductUserReview> UserReviews { get; set; } = new();
 
+        public double Rating { get; set; } = 0d;
+
         public bool IsDeleted { get; set; }
     }
 }

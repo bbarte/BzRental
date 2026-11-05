@@ -16,5 +16,7 @@ namespace BzRental.Domain.Products.Models
 
         public int Rating { get; set; } = 0;
         public string Content { get; set; } = string.Empty;
+
+        public DateTime? ModifiedAt { get; set; }
     }
 }

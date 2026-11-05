@@ -53,6 +53,9 @@ namespace BzRental.DbAccess.Migrations
                         .HasMaxLength(512)
                         .HasColumnType("varchar");
 
+                    b.Property<double>("Rating")
+                        .HasColumnType("float");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
@@ -60,6 +63,8 @@ namespace BzRental.DbAccess.Migrations
                     b.HasIndex("HourPrice");
 
                     b.HasIndex("Name");
+
+                    b.HasIndex("Rating");
 
                     b.ToTable("Products");
                 });
@@ -175,6 +180,9 @@ namespace BzRental.DbAccess.Migrations
                     b.Property<int>("CreatedById")
                         .HasColumnType("int");
 
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime");
+
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
@@ -186,6 +194,8 @@ namespace BzRental.DbAccess.Migrations
                     b.HasIndex("CreatedById");
 
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("Rating");
 
                     b.ToTable("ProductUserReviews");
                 });

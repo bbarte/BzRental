@@ -23,8 +23,11 @@ namespace BzRental.Application.Products
             services.AddScoped<IValidator<AddProductRequest>, AddProductValidator>();
             services.AddScoped<IValidator<UpdateProductRequest>, UpdateProductValidator>();
 
+            services.AddScoped<IValidator<AddUpdateProductReviewRequest>, AddUpdateProductReviewValidator>();
+
             services.AddScoped<IProductCategoriesService, ProductCategoriesService>();
             services.AddScoped<IProductsManagementService, ProductsManagementService>();
+            services.AddScoped<IProductUserReviewsService, ProductUserReviewsService>();
 
             return services;
         }
