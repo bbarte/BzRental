@@ -1,6 +1,9 @@
 ﻿using BzRental.Api.Extensions;
 using BzRental.Application.Products.Dtos;
+using BzRental.Application.Products.Requests;
 using BzRental.Application.Products.Services;
+using BzRental.Shared.Contracts.Dtos;
+using BzRental.Shared.Pagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +26,16 @@ namespace BzRental.Api.Controllers.Products
             [FromRoute] int categoryId)
         {
             return (await _service.GetDistinctCategoryFieldValues(categoryId)).ToActionResult();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<PaginatedList<ProductDto>>> SearchProducts(
+            [FromQuery] int categoryId,
+            [FromQuery] PaginationParameters pagination,
+            [FromBody] SearchProductsRequest request,
+            [FromQuery] string? orderBy = null)
+        {
+            return (await _service.SearchProducts(pagination, categoryId, request, orderBy)).ToActionResult();
         }
     }
 }
