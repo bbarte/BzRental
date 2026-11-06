@@ -28,7 +28,7 @@ namespace BzRental.Api.Controllers.Products
             return (await _service.GetDistinctCategoryFieldValues(categoryId)).ToActionResult();
         }
 
-        [HttpPost]
+        [HttpPost("search")]
         public async Task<ActionResult<PaginatedList<ProductDto>>> SearchProducts(
             [FromQuery] int categoryId,
             [FromQuery] PaginationParameters pagination,
