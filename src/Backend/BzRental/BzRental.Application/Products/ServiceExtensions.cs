@@ -25,6 +25,9 @@ namespace BzRental.Application.Products
 
             services.AddScoped<IValidator<AddUpdateProductReviewRequest>, AddUpdateProductReviewValidator>();
 
+            services.AddScoped<IValidator<SearchProductsFieldValueFilter>, SearchProductsFieldValueValidator>();
+            services.AddScoped<IValidator<SearchProductsRequest>, SearchProductsValidator>();
+
             services.AddScoped<IProductCategoriesService, ProductCategoriesService>();
             services.AddScoped<IProductsManagementService, ProductsManagementService>();
             services.AddScoped<IProductUserReviewsService, ProductUserReviewsService>();

@@ -1,8 +1,15 @@
 ﻿using BzRental.Application.Products.Dtos;
+using BzRental.Application.Products.Requests;
 using BzRental.DbAccess.Contexts;
+using BzRental.DbAccess.Extensions;
 using BzRental.Domain.Products.Enums;
 using BzRental.Domain.Products.Models;
+using BzRental.Shared.Contracts.Dtos;
+using BzRental.Shared.Extensions;
+using BzRental.Shared.Pagination;
 using BzRental.Shared.ResultPattern;
+using FluentValidation;
+using LinqKit;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -18,11 +25,25 @@ namespace BzRental.Application.Products.Services
             public string Value { get; set; } = string.Empty;
         }
 
-        private readonly BzRentalDbContext _ctx;
+        private class TempFieldValue
+        {
+            public int ProductId { get; set; }
+            public int FieldId { get; set; }
 
-        public ProductsSelectingService(BzRentalDbContext ctx)
+            public string TextValue { get; set; } = string.Empty;
+            public double NumberValue { get; set; } = 0d;
+            public bool BoolValue { get; set; }
+        }
+
+        private readonly BzRentalDbContext _ctx;
+        private readonly IValidator<SearchProductsRequest> _searchValidator;
+
+        public ProductsSelectingService(
+            BzRentalDbContext ctx,
+            IValidator<SearchProductsRequest> searchValidator)
         {
             _ctx = ctx;
+            _searchValidator = searchValidator;
         }
 
         public async Task<Result<List<ProductCategoryDistinctFieldValuesDto>>> GetDistinctCategoryFieldValues(int categoryId)
@@ -94,6 +115,178 @@ namespace BzRental.Application.Products.Services
             }
 
             return result;
+        }
+
+        public async Task<Result<PaginatedList<ProductDto>>> SearchProducts(
+            PaginationParameters pagination,
+            int categoryId,
+            SearchProductsRequest request,
+            string? orderBy = null)
+        {
+            var valResult = _searchValidator.ValidateToBzRentalResult(request);
+            if (valResult.IsFailure) return valResult;
+
+            IQueryable<Product> query = _ctx.Products
+                .AsNoTracking()
+                .Where(x => x.CategoryId == categoryId && !x.IsDeleted);
+
+            if (!string.IsNullOrWhiteSpace(request.Name))
+            {
+                foreach (string keyword in request.Name.Split(' ').Take(10))
+                {
+                    query = query.Where(x => x.Name.Contains(keyword));
+                }
+            }
+
+            if (request.DailyPriceFrom.HasValue)
+                query = query.Where(x => x.DailyPrice >= request.DailyPriceFrom);
+
+            if (request.DailyPriceTo.HasValue)
+                query = query.Where(x => x.DailyPrice <= request.DailyPriceTo);
+
+            if (request.RatingFrom.HasValue)
+                query = query.Where(x => x.Rating >= request.RatingFrom);
+
+            if (request.RatingTo.HasValue)
+                query = query.Where(x => x.Rating <= request.RatingTo);
+
+            foreach (SearchProductsFieldValueFilter filter in request.FieldValueFilters)
+            {
+                if (filter.ExactBoolValue.HasValue)
+                {
+                    query = query.Where(x =>
+                        x.FieldValues.Any(f =>
+                            f.FieldId == filter.FieldId &&
+                            f.BoolValue == filter.ExactBoolValue));
+                }
+
+                if (filter.ExactNumberValue.HasValue)
+                {
+                    query = query.Where(x =>
+                        x.FieldValues.Any(f =>
+                            f.FieldId == filter.FieldId &&
+                            f.NumberValue == filter.ExactNumberValue));
+                }
+
+                if (filter.NumberValueFrom.HasValue)
+                {
+                    query = query.Where(x =>
+                        x.FieldValues.Any(f =>
+                            f.FieldId == filter.FieldId &&
+                            f.NumberValue >= filter.NumberValueFrom));
+                }
+                if (filter.NumberValueTo.HasValue)
+                {
+                    query = query.Where(x =>
+                        x.FieldValues.Any(f =>
+                            f.FieldId == filter.FieldId &&
+                            f.NumberValue <= filter.NumberValueTo));
+                }
+
+                if (filter.AllowedTextValues.Count > 0)
+                {
+                    List<string> distinctAllowedTextValues = filter.AllowedTextValues.Distinct().ToList();
+
+                    query = query.Where(x =>
+                        x.FieldValues.Any(f =>
+                            f.FieldId == filter.FieldId &&
+                            distinctAllowedTextValues.Contains(f.TextValue)));
+                }
+            }
+
+            query = query.Where(x =>
+                !x.Rentings.Any(r =>
+                    r.DoesReserveProduct &&
+                    r.StartDate <= request.EndDate &&
+                    r.EndDate >= request.StartDate));
+
+            IQueryable<ProductDto> dtoQuery = query
+                .Select(x => new ProductDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Description = x.Description,
+                    DailyPrice = x.DailyPrice,
+                    CategoryId = x.CategoryId,
+                    Rating = x.Rating,
+                    CreatedAt = x.CreatedAt,
+                    FirstImageFileName = x.Images
+                        .Select(x => x.FileName)
+                        .FirstOrDefault()
+                });
+
+            if (!string.IsNullOrEmpty(orderBy))
+            {
+                switch (orderBy)
+                {
+                    case "asc(name)":
+                        dtoQuery = dtoQuery
+                            .OrderBy(x => x.Name)
+                            .ThenBy(x => x.Id);
+                        break;
+                    case "desc(name)":
+                        dtoQuery = dtoQuery
+                            .OrderByDescending(x => x.Name)
+                            .ThenBy(x => x.Id);
+                        break;
+                    case "asc(dailyPrice)":
+                        dtoQuery = dtoQuery
+                            .OrderBy(x => x.DailyPrice)
+                            .ThenBy(x => x.Id);
+                        break;
+                    case "desc(dailyPrice)":
+                        dtoQuery = dtoQuery
+                            .OrderByDescending(x => x.DailyPrice)
+                            .ThenBy(x => x.Id);
+                        break;
+                    case "asc(rating)":
+                        dtoQuery = dtoQuery
+                            .OrderBy(x => x.Rating)
+                            .ThenBy(x => x.Id);
+                        break;
+                    case "desc(rating)":
+                        dtoQuery = dtoQuery
+                            .OrderByDescending(x => x.Rating)
+                            .ThenBy(x => x.Id);
+                        break;
+                }
+            }
+            else
+            {
+                dtoQuery = dtoQuery.OrderBy(x => x.Id);
+            }
+
+            PaginatedList<ProductDto> list = await dtoQuery.ToPaginatedListAsync(pagination);
+
+            List<int> selectedIds = list.Items.Select(x => x.Id).ToList();
+
+            List<TempFieldValue> fieldValues = await _ctx.ProductFieldValues
+                .Where(x => selectedIds.Contains(x.ProductId))
+                .Select(x => new TempFieldValue
+                {
+                    ProductId = x.ProductId,
+                    FieldId = x.FieldId,
+                    TextValue = x.TextValue,
+                    NumberValue = x.NumberValue,
+                    BoolValue = x.BoolValue
+                })
+                .ToListAsync();
+
+            foreach (ProductDto product in list.Items)
+            {
+                product.FieldValues = fieldValues
+                    .Where(x => x.ProductId == product.Id)
+                    .Select(x => new ProductFieldInfoDto
+                    {
+                        Id = x.FieldId,
+                        TextValue = x.TextValue,
+                        NumberValue = x.NumberValue,
+                        BoolValue = x.BoolValue
+                    })
+                    .ToList();
+            }
+
+            return list;
         }
     }
 }

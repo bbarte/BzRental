@@ -1,4 +1,7 @@
 ﻿using BzRental.Application.Products.Dtos;
+using BzRental.Application.Products.Requests;
+using BzRental.Shared.Contracts.Dtos;
+using BzRental.Shared.Pagination;
 using BzRental.Shared.ResultPattern;
 using System;
 using System.Collections.Generic;
@@ -10,5 +13,11 @@ namespace BzRental.Application.Products.Services
     {
         Task<Result<List<ProductCategoryDistinctFieldValuesDto>>> GetDistinctCategoryFieldValues(
             int categoryId);
+
+        Task<Result<PaginatedList<ProductDto>>> SearchProducts(
+            PaginationParameters pagination,
+            int categoryId,
+            SearchProductsRequest request,
+            string? orderBy = null);
     }
 }
