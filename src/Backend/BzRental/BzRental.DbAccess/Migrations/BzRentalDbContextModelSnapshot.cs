@@ -123,9 +123,10 @@ namespace BzRental.DbAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FieldId");
+                    b.HasIndex("FieldId", "ProductId");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("ProductId", "FieldId")
+                        .IsUnique();
 
                     b.ToTable("ProductFieldValues");
                 });

@@ -19,6 +19,19 @@ namespace BzRental.Configuration.Products
                 .WithMany(x => x.FieldValues)
                 .HasForeignKey(x => x.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasIndex(x => new
+            {
+                x.ProductId,
+                x.FieldId
+            })
+            .IsUnique();
+
+            builder.HasIndex(x => new
+            {
+                x.FieldId,
+                x.ProductId
+            });
         }
     }
 }
