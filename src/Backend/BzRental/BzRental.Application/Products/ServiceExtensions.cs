@@ -28,6 +28,7 @@ namespace BzRental.Application.Products
             services.AddScoped<IProductCategoriesService, ProductCategoriesService>();
             services.AddScoped<IProductsManagementService, ProductsManagementService>();
             services.AddScoped<IProductUserReviewsService, ProductUserReviewsService>();
+            services.AddScoped<IProductsSelectingService, ProductsSelectingService>();
 
             return services;
         }
