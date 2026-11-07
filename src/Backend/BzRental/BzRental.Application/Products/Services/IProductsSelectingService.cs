@@ -21,5 +21,10 @@ namespace BzRental.Application.Products.Services
             string? orderBy = null);
 
         Task<Result<ProductDetailsDto>> GetProductById(int id);
+
+        Task<Result<ProductAvailabilityDto>> CheckProductAvailibilty(
+            int productId,
+            DateTime startDate,
+            DateTime endDate);
     }
 }

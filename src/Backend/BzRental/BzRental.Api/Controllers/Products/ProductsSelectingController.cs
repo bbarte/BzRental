@@ -44,5 +44,14 @@ namespace BzRental.Api.Controllers.Products
         {
             return (await _service.GetProductById(id)).ToActionResult();
         }
+
+        [HttpPost("{productId}/check-availability")]
+        public async Task<ActionResult<ProductAvailabilityDto>> CheckProductAvailability(
+            [FromRoute] int productId,
+            [FromQuery] DateTime startDate,
+            [FromQuery] DateTime endDate)
+        {
+            return (await _service.CheckProductAvailibilty(productId, startDate, endDate)).ToActionResult();
+        }
     }
 }

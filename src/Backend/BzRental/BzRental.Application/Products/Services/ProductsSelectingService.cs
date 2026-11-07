@@ -328,5 +328,36 @@ namespace BzRental.Application.Products.Services
 
             return dto;
         }
+
+        public async Task<Result<ProductAvailabilityDto>> CheckProductAvailibilty(
+            int productId,
+            DateTime startDate,
+            DateTime endDate)
+        {
+            bool isAvailable = !await _ctx.ProductRentings
+                .Where(x =>
+                    x.ProductId == productId &&
+                    x.DoesReserveProduct &&
+                    x.StartDate <= startDate &&
+                    x.EndDate >= endDate)
+                .AnyAsync();
+
+            List<ProductAvailibiltyPlannedRentingDto> plannedRentings = await _ctx.ProductRentings
+                .Where(x =>
+                    x.ProductId == productId &&
+                    x.DoesReserveProduct)
+                .Select(x => new ProductAvailibiltyPlannedRentingDto
+                {
+                    StartDate = x.StartDate,
+                    EndDate = x.EndDate
+                })
+                .ToListAsync();
+
+            return new ProductAvailabilityDto
+            {
+                IsAvailable = isAvailable,
+                PlannedRentings = plannedRentings
+            };
+        }
     }
 }
