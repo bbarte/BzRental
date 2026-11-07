@@ -1,6 +1,7 @@
 import { ApiClient } from "../../ApiAccess/ApiClient";
 import type IPaginatedList from "../../Shared/Models/IPaginatedList";
 import type IPaginationParameters from "../../Shared/Models/IPaginationParameters";
+import type IIsProductRentedByUserDto from "../Dtos/IIsProductRentedByUserDto";
 import type { IProductAvailabilityDto } from "../Dtos/IProductAvailabilityDto";
 import type IProductCategoryDistinctFieldValuesDto from "../Dtos/IProductCategoryDistinctFieldValuesDto";
 import type IProductDetailsDto from "../Dtos/IProductDetailsDto";
@@ -67,6 +68,14 @@ export default class ProductsSelectingService {
                     endDate: endDate
                 }
             }
+        );
+
+        return data;
+    }
+
+    public static async checkIfProductIsRentedByUser(productId: number) : Promise<IIsProductRentedByUserDto> {
+        const {data} = await ApiClient.instance.http.post<IIsProductRentedByUserDto>(
+            `products/${productId}/check-if-rented-by-user-now`, null
         );
 
         return data;
