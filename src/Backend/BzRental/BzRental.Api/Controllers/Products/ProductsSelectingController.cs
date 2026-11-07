@@ -37,5 +37,12 @@ namespace BzRental.Api.Controllers.Products
         {
             return (await _service.SearchProducts(pagination, categoryId, request, orderBy)).ToActionResult();
         }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ProductDetailsDto>> GetProductById(
+            [FromRoute] int id)
+        {
+            return (await _service.GetProductById(id)).ToActionResult();
+        }
     }
 }

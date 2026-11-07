@@ -19,5 +19,7 @@ namespace BzRental.Application.Products.Services
             int categoryId,
             SearchProductsRequest request,
             string? orderBy = null);
+
+        Task<Result<ProductDetailsDto>> GetProductById(int id);
     }
 }

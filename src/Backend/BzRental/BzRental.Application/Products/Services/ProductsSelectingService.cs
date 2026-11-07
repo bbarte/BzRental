@@ -5,6 +5,7 @@ using BzRental.DbAccess.Extensions;
 using BzRental.Domain.Products.Enums;
 using BzRental.Domain.Products.Models;
 using BzRental.Shared.Contracts.Dtos;
+using BzRental.Shared.Errors;
 using BzRental.Shared.Extensions;
 using BzRental.Shared.Pagination;
 using BzRental.Shared.ResultPattern;
@@ -287,6 +288,45 @@ namespace BzRental.Application.Products.Services
             }
 
             return list;
+        }
+
+        public async Task<Result<ProductDetailsDto>> GetProductById(int id)
+        {
+            ProductDetailsDto? dto = await _ctx.Products
+                .Where(x => x.Id == id && !x.IsDeleted)
+                .Select(x => new ProductDetailsDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Description = x.Description,
+                    DailyPrice = x.DailyPrice,
+                    CategoryId = x.CategoryId,
+                    CategoryName = x.Category.Name,
+                    Rating = x.Rating,
+                    CreatedAt = x.CreatedAt
+                })
+                .FirstOrDefaultAsync();
+
+            if (dto == null)
+                return SharedErrors.NotFound;
+
+            dto.ImageFileNames = await _ctx.ProductImages
+                .Where(x => x.ProductId == id)
+                .Select(x => x.FileName)
+                .ToListAsync();
+
+            dto.FieldValues = await _ctx.ProductFieldValues
+                .Where(x => x.ProductId == id)
+                .Select(x => new ProductFieldInfoDto
+                {
+                    Id = x.FieldId,
+                    TextValue = x.TextValue,
+                    NumberValue = x.NumberValue,
+                    BoolValue = x.BoolValue
+                })
+                .ToListAsync();
+
+            return dto;
         }
     }
 }
