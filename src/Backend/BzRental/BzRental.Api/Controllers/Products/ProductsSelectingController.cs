@@ -15,10 +15,21 @@ namespace BzRental.Api.Controllers.Products
     public class ProductsSelectingController : ControllerBase
     {
         private readonly IProductsSelectingService _service;
+        private readonly IProductsManagementService _managementService;
 
-        public ProductsSelectingController(IProductsSelectingService service)
+        public ProductsSelectingController(
+            IProductsSelectingService service,
+            IProductsManagementService managementService)
         {
             _service = service;
+            _managementService = managementService;
+        }
+
+        [HttpGet("categories/{categoryId}/fields")]
+        public async Task<ActionResult<List<ProductFieldInfoDto>>> GetCategoryFields(
+            int categoryId)
+        {
+            return (await _managementService.GetFieldsInfoForCategory(categoryId)).ToActionResult();
         }
 
         [HttpGet("categories/{categoryId}/distinct")]
