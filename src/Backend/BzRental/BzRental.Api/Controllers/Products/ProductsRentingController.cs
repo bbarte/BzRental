@@ -28,7 +28,7 @@ namespace BzRental.Api.Controllers.Products
             _rentManagementService = rentManagementService;
         }
 
-        [HttpGet("rentings/users")]
+        [HttpGet("rentings/own")]
         public async Task<ActionResult<PaginatedList<UsersProductRentingDto>>> GetUsersRentings(
             [FromQuery] PaginationParameters pagination,
             [FromQuery] GetRentingsStatusFilter? status = null,
