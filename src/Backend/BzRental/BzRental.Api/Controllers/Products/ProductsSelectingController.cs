@@ -64,5 +64,12 @@ namespace BzRental.Api.Controllers.Products
         {
             return (await _service.CheckProductAvailibilty(productId, startDate, endDate)).ToActionResult();
         }
+
+        [HttpGet("{productId}/check-if-rented-by-user-now")]
+        public async Task<ActionResult<IsProductRentedByUserDto>> CheckIfProductIsRentedByUser(
+            [FromRoute] int productId)
+        {
+            return (await _service.CheckIfProductIsRentedByUser(productId)).ToActionResult();
+        }
     }
 }

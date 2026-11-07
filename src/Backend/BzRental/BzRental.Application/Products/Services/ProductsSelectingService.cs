@@ -4,6 +4,8 @@ using BzRental.DbAccess.Contexts;
 using BzRental.DbAccess.Extensions;
 using BzRental.Domain.Products.Enums;
 using BzRental.Domain.Products.Models;
+using BzRental.Domain.ProductsRenting.Enums;
+using BzRental.Shared.Abstraction;
 using BzRental.Shared.Contracts.Dtos;
 using BzRental.Shared.Errors;
 using BzRental.Shared.Extensions;
@@ -37,13 +39,16 @@ namespace BzRental.Application.Products.Services
         }
 
         private readonly BzRentalDbContext _ctx;
+        private readonly IUserProvider _userProvider;
         private readonly IValidator<SearchProductsRequest> _searchValidator;
 
         public ProductsSelectingService(
             BzRentalDbContext ctx,
+            IUserProvider userProvider,
             IValidator<SearchProductsRequest> searchValidator)
         {
             _ctx = ctx;
+            _userProvider = userProvider;
             _searchValidator = searchValidator;
         }
 
@@ -358,6 +363,47 @@ namespace BzRental.Application.Products.Services
                 IsAvailable = isAvailable,
                 PlannedRentings = plannedRentings
             };
+        }
+
+        public async Task<Result<IsProductRentedByUserDto>> CheckIfProductIsRentedByUser(int productId)
+        {
+            var getUserResult = _userProvider.GetUser();
+            if (getUserResult.IsFailure) return getUserResult.FailedCast<IsProductRentedByUserDto>();
+
+            SharedUser loggedUser = getUserResult.Value;
+
+            var rentInfo = await _ctx.ProductRentings
+                .Where(x =>
+                    x.ProductId == productId &&
+                    x.CreatedById == loggedUser.Id &&
+                    (
+                        x.Status == ProductRentingStatus.Planned ||
+                        x.Status == ProductRentingStatus.InProgress
+                    ) &&
+                    x.DoesReserveProduct)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.Status
+                })
+                .FirstOrDefaultAsync();
+
+            if (rentInfo == null)
+            {
+                return new IsProductRentedByUserDto
+                {
+                    IsIt = false
+                };
+            }
+            else
+            {
+                return new IsProductRentedByUserDto
+                {
+                    IsIt = false,
+                    RentingId = rentInfo.Id,
+                    Status = rentInfo.Status
+                };
+            }
         }
     }
 }
