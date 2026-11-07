@@ -399,7 +399,7 @@ namespace BzRental.Application.Products.Services
             {
                 return new IsProductRentedByUserDto
                 {
-                    IsIt = false,
+                    IsIt = true,
                     RentingId = rentInfo.Id,
                     Status = rentInfo.Status
                 };
