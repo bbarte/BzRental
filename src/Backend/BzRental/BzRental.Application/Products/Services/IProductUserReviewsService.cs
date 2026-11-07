@@ -16,6 +16,8 @@ namespace BzRental.Application.Products.Services
             PaginationParameters pagination,
             string? orderBy = null);
 
+        Task<Result<ProductReviewDto>> GetUsersReview(int productId);
+
         Task<Result<CreatedObjectDto<int>>> AddReview(int productId, AddUpdateProductReviewRequest request);
         Task<Result> UpdateReview(int id, AddUpdateProductReviewRequest request);
         Task<Result> DeleteReview(int id);

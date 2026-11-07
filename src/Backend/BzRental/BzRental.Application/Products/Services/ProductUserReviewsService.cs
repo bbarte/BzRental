@@ -40,9 +40,16 @@ namespace BzRental.Application.Products.Services
             PaginationParameters pagination,
             string? orderBy = null)
         {
+            var getUserResult = _userProvider.GetUser();
+            if (getUserResult.IsFailure) return getUserResult.FailedCast<PaginatedList<ProductReviewDto>>();
+
+            SharedUser loggedUser = getUserResult.Value;
+
             IQueryable<ProductUserReview> query = _ctx.ProductUserReviews;
 
-            query = query.Where(x => x.ProductId == productId);
+            query = query.Where(x =>
+                x.ProductId == productId &&
+                x.CreatedById != loggedUser.Id);
 
             IQueryable<ProductReviewDto> dtoQuery = query
                 .Select(x => new ProductReviewDto
@@ -88,6 +95,31 @@ namespace BzRental.Application.Products.Services
             }
 
             return await dtoQuery.ToPaginatedListAsync(pagination);
+        }
+
+        public async Task<Result<ProductReviewDto>> GetUsersReview(int productId)
+        {
+            var getUserResult = _userProvider.GetUser();
+            if (getUserResult.IsFailure) return getUserResult.FailedCast<ProductReviewDto>();
+
+            SharedUser loggedUser = getUserResult.Value;
+
+            ProductReviewDto? dto = await _ctx.ProductUserReviews
+                .Where(x => x.ProductId == productId && x.CreatedById == loggedUser.Id)
+                .Select(x => new ProductReviewDto
+                {
+                    Id = x.Id,
+                    Rating = x.Rating,
+                    Content = x.Content,
+                    CreatedAt = x.CreatedAt,
+                    ModifiedAt = x.ModifiedAt
+                })
+                .FirstOrDefaultAsync();
+
+            if (dto == null)
+                return SharedErrors.NotFound;
+
+            return dto;
         }
 
         public async Task<Result<CreatedObjectDto<int>>> AddReview(
