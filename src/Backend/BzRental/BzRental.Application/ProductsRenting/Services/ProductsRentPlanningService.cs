@@ -158,8 +158,8 @@ namespace BzRental.Application.ProductsRenting.Services
                     x.ProductId == productId &&
                     x.CreatedById == loggedUser.Id &&
                     x.DoesReserveProduct &&
-                    x.StartDate < request.EndDate &&
-                    x.EndDate > request.StartDate
+                    x.StartDate <= request.EndDate &&
+                    x.EndDate >= request.StartDate
                 )
                 .AnyAsync();
 
@@ -170,8 +170,8 @@ namespace BzRental.Application.ProductsRenting.Services
                 .Where(x =>
                     x.ProductId == productId &&
                     x.DoesReserveProduct &&
-                    x.StartDate < request.EndDate &&
-                    x.EndDate > request.StartDate
+                    x.StartDate <= request.EndDate &&
+                    x.EndDate >= request.StartDate
                 )
                 .AnyAsync();
 

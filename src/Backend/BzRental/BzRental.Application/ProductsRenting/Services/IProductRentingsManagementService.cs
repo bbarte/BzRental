@@ -22,6 +22,8 @@ namespace BzRental.Application.ProductsRenting.Services
             DateTime? dateTo = null,
             string? orderBy = null);
 
+        Task<Result<List<ProductRentingStatusChangeDto>>> GetRentingsStatusChanges(int rentingId);
+
         Task<Result> ConfirmRentingPlanHandover(
             int id,
             ConfirmProductRentingPlanHandoverRequest request);

@@ -148,6 +148,22 @@ namespace BzRental.Application.ProductsRenting.Services
             return await dtoQuery.ToPaginatedListAsync(pagination);
         }
 
+        public async Task<Result<List<ProductRentingStatusChangeDto>>> GetRentingsStatusChanges(int rentingId)
+        {
+            return await _ctx.ProductRentingStatusChanges
+                .Where(x => x.RentingId == rentingId)
+                .Select(x => new ProductRentingStatusChangeDto
+                {
+                    Id = x.Id,
+                    CurrentStatus = x.CurrentStatus,
+                    CreatedBy = $"{x.CreatedBy.FirstName} {x.CreatedBy.LastName}",
+                    CreatedById = x.CreatedById,
+                    Comments = x.Comments,
+                    CreatedAt = x.CreatedAt
+                })
+                .ToListAsync();
+        }
+
         public async Task<Result> ConfirmRentingPlanHandover(
             int id,
             ConfirmProductRentingPlanHandoverRequest request)

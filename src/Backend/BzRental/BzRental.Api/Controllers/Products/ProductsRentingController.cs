@@ -68,6 +68,13 @@ namespace BzRental.Api.Controllers.Products
             return (await _rentManagementService.GetRentings(pagination, productId, createdById, status, dateFrom, dateTo, orderBy)).ToActionResult();
         }
 
+        [HttpGet("rentings/{rentingId}/status-changes")]
+        public async Task<ActionResult<List<ProductRentingStatusChangeDto>>> GetRentingsStatusChanges(
+            [FromRoute] int rentingId)
+        {
+            return (await _rentManagementService.GetRentingsStatusChanges(rentingId)).ToActionResult();
+        }
+
         [HttpPost("rentings/{id}/confirm-renting-plan-handover"), Authorize(Roles = AuthRoles.Admin)]
         public async Task<IActionResult> ConfirmRentingPlanHandover(
             [FromRoute] int id,

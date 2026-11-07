@@ -1,4 +1,5 @@
-﻿using BzRental.Shared.Models;
+﻿using BzRental.Domain.ProductsRenting.Models;
+using BzRental.Shared.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,6 +18,7 @@ namespace BzRental.Domain.Products.Models
         public List<ProductFieldValue> FieldValues { get; set; } = new();
         public List<ProductImage> Images { get; set; } = new();
         public List<ProductUserReview> UserReviews { get; set; } = new();
+        public List<ProductRenting> Rentings { get; set; } = new();
 
         public double Rating { get; set; } = 0d;
 
