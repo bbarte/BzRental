@@ -4,12 +4,21 @@ import type IPaginationParameters from "../../Shared/Models/IPaginationParameter
 import type IIsProductRentedByUserDto from "../Dtos/IIsProductRentedByUserDto";
 import type { IProductAvailabilityDto } from "../Dtos/IProductAvailabilityDto";
 import type IProductCategoryDistinctFieldValuesDto from "../Dtos/IProductCategoryDistinctFieldValuesDto";
+import type IProductCategoryMinimalDto from "../Dtos/IProductCategoryMinimalDto";
 import type IProductDetailsDto from "../Dtos/IProductDetailsDto";
 import type IProductDto from "../Dtos/IProductDto";
 import type IProductFieldInfoDto from "../Dtos/ProductFieldInfoDto";
 import type { ISearchProductsRequest } from "../Requests/ISearchProductsRequest";
 
 export default class ProductsSelectingService {
+    public static async getCategories(): Promise<IProductCategoryMinimalDto[]> {
+        const {data} = await ApiClient.instance.http.get<IProductCategoryMinimalDto[]>(
+            'products/categories'
+        );
+
+        return data;
+    }
+
     public static async getCategoryFields(categoryId: number) : Promise<IProductFieldInfoDto[]> {
         const {data} = await ApiClient.instance.http.get<IProductFieldInfoDto[]>(
             `products/categories/${categoryId}/fields`
