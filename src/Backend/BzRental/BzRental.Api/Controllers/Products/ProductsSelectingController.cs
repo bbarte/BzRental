@@ -36,7 +36,7 @@ namespace BzRental.Api.Controllers.Products
 
         [HttpGet("categories/{categoryId}/fields")]
         public async Task<ActionResult<List<ProductFieldInfoDto>>> GetCategoryFields(
-            int categoryId)
+            [FromRoute] int categoryId)
         {
             return (await _managementService.GetFieldsInfoForCategory(categoryId)).ToActionResult();
         }
