@@ -16,13 +16,22 @@ namespace BzRental.Api.Controllers.Products
     {
         private readonly IProductsSelectingService _service;
         private readonly IProductsManagementService _managementService;
+        private readonly IProductCategoriesService _categoriesService;
 
         public ProductsSelectingController(
             IProductsSelectingService service,
-            IProductsManagementService managementService)
+            IProductsManagementService managementService,
+            IProductCategoriesService categoriesService)
         {
             _service = service;
             _managementService = managementService;
+            _categoriesService = categoriesService;
+        }
+
+        [HttpGet("categories")]
+        public async Task<ActionResult<List<ProductCategoryMinimalDto>>> GetCategories()
+        {
+            return (await _categoriesService.GetMinimalProductCategories()).ToActionResult();
         }
 
         [HttpGet("categories/{categoryId}/fields")]

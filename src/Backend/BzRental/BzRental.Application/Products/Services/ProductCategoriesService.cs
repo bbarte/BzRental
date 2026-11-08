@@ -157,6 +157,7 @@ namespace BzRental.Application.Products.Services
                     Id = x.Id,
                     Name = x.Name
                 })
+                .OrderBy(x => x.Name)
                 .ToListAsync();
         }
 
