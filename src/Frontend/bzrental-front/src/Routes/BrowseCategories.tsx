@@ -56,10 +56,8 @@ export default function BrowseCategories() {
                                     <Link to={`/browse-products?categoryId=${cat.id}`} className="text-decoration-none text-reset ">
                                         <div className="p-2 rounded shadow-sm border">
                                             <div className="d-flex flex-row align-items-center">
-                                                <div className="bg bg-warning-subtle fw-bold bg-gradient fs-3 d-flex align-items-center justify-content-center rounded" style={{color: '#997d2b', width: '48px', height: '48px'}}>
-                                                    <span style={{ transform: 'rotate(-20deg) translate(-1px, -1px)', display: 'inline-block' }}>
-                                                        {cat.name[0].toUpperCase()}
-                                                    </span>
+                                                <div className="bg bg-warning-subtle bg-gradient fs-3 d-flex align-items-center justify-content-center rounded" style={{color: '#997d2b', width: '48px', height: '48px'}}>
+                                                    {cat.name[0].toUpperCase()}
                                                 </div>
                                                 <div className="fs-5 ms-3">{cat.name}</div>
                                             </div>
