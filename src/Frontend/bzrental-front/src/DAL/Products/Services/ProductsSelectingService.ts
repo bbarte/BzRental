@@ -19,6 +19,14 @@ export default class ProductsSelectingService {
         return data;
     }
 
+    public static async getCategoryById(id: number): Promise<IProductCategoryMinimalDto> {
+        const {data} = await ApiClient.instance.http.get<IProductCategoryMinimalDto>(
+            `products/categories/${id}`
+        );
+
+        return data;
+    }
+
     public static async getCategoryFields(categoryId: number) : Promise<IProductFieldInfoDto[]> {
         const {data} = await ApiClient.instance.http.get<IProductFieldInfoDto[]>(
             `products/categories/${categoryId}/fields`

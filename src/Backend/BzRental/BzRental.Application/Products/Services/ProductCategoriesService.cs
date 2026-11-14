@@ -161,6 +161,23 @@ namespace BzRental.Application.Products.Services
                 .ToListAsync();
         }
 
+        public async Task<Result<ProductCategoryMinimalDto>> GetMinimalProductCategoryById(int id)
+        {
+            ProductCategoryMinimalDto? dto = await _ctx.ProductCategories
+                .Where(x => x.Id == id)
+                .Select(x => new ProductCategoryMinimalDto
+                {
+                    Id = x.Id,
+                    Name = x.Name
+                })
+                .FirstOrDefaultAsync();
+
+            if (dto == null)
+                return SharedErrors.NotFound;
+
+            return dto;
+        }
+
         public async Task<Result<CreatedObjectDto<int>>> AddProductCategory(AddProductCategoryRequest request)
         {
             var valResult = _addCatValidator.ValidateToBzRentalResult(request);

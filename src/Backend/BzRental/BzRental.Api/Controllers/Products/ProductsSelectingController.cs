@@ -34,6 +34,13 @@ namespace BzRental.Api.Controllers.Products
             return (await _categoriesService.GetMinimalProductCategories()).ToActionResult();
         }
 
+        [HttpGet("categories/{id}")]
+        public async Task<ActionResult<ProductCategoryMinimalDto>> GetCategoryById(
+            [FromRoute] int id)
+        {
+            return (await _categoriesService.GetMinimalProductCategoryById(id)).ToActionResult();
+        }
+
         [HttpGet("categories/{categoryId}/fields")]
         public async Task<ActionResult<List<ProductFieldInfoDto>>> GetCategoryFields(
             [FromRoute] int categoryId)

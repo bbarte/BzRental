@@ -17,6 +17,7 @@ namespace BzRental.Application.Products.Services
         Task<Result<ProductCategoryFieldDto>> GetProductCategoryFieldById(int id);
 
         Task<Result<List<ProductCategoryMinimalDto>>> GetMinimalProductCategories();
+        Task<Result<ProductCategoryMinimalDto>> GetMinimalProductCategoryById(int id);
 
         Task<Result<CreatedObjectDto<int>>> AddProductCategory(AddProductCategoryRequest request);
         Task<Result<CreatedObjectDto<int>>> AddProductCategoryField(int categoryId, AddProductCategoryFieldRequest request);
