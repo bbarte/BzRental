@@ -8,6 +8,8 @@ import ProtectedAdminRoute from './Routes/ProtectedAdminRoute'
 import Users from './Routes/Admin/Users'
 import ProductCategories from './Routes/Admin/ProductCategories'
 import Products from './Routes/Admin/Products'
+import ProtectedRoute from './Routes/ProtectedRoute'
+import BrowseCategories from './Routes/BrowseCategories'
 
 function App() {
   return (
@@ -22,6 +24,10 @@ function App() {
           <Route path='/admin/users' element={<Users/>}/>
           <Route path='/admin/product-categories' element={<ProductCategories/>}/>
           <Route path='/admin/products' element={<Products/>}/>
+        </Route>
+
+        <Route element={<ProtectedRoute/>}>
+          <Route path='/browse-categories' element={<BrowseCategories/>}/>
         </Route>
 
         <Route path='*' element={<NotFound/>}/>

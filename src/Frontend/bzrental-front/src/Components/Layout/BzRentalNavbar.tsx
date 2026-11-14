@@ -68,6 +68,16 @@ export function BzRentalNavbar({isUserLoggedIn, handleLogout}: BzRentalNavbarPro
                                     </ul>
                                 </li>
                             }
+                            {
+                                isUserLoggedIn &&
+                                <>
+                                    <li>
+                                        <NavLink to='/browse-categories' className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                                            Wypożycz przedmioty
+                                        </NavLink>
+                                    </li>
+                                </>
+                            }
                         </ul>
 
                         <div className="ms-auto">
