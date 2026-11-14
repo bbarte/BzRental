@@ -10,6 +10,7 @@ import ProductCategories from './Routes/Admin/ProductCategories'
 import Products from './Routes/Admin/Products'
 import ProtectedRoute from './Routes/ProtectedRoute'
 import BrowseCategories from './Routes/BrowseCategories'
+import BrowseProducts from './Routes/BrowseProducts'
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
 
         <Route element={<ProtectedRoute/>}>
           <Route path='/browse-categories' element={<BrowseCategories/>}/>
+          <Route path='/browse-products' element={<BrowseProducts/>}/>
         </Route>
 
         <Route path='*' element={<NotFound/>}/>
