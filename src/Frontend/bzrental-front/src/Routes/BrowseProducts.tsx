@@ -8,7 +8,10 @@ import type IProductCategoryMinimalDto from "../DAL/Products/Dtos/IProductCatego
 import ProductsSelectingService from "../DAL/Products/Services/ProductsSelectingService";
 import { ErrorMessagesList } from "../Components/ErrorMessagesList";
 import { InfoMessagesList } from "../Components/InfoMessagesList";
-import type { ISearchProductsRequest } from "../DAL/Products/Requests/ISearchProductsRequest";
+import type { ISearchProductsFieldValueFilter, ISearchProductsRequest } from "../DAL/Products/Requests/ISearchProductsRequest";
+import type IProductFieldInfoDto from "../DAL/Products/Dtos/ProductFieldInfoDto";
+import type IProductCategoryDistinctFieldValuesDto from "../DAL/Products/Dtos/IProductCategoryDistinctFieldValuesDto";
+import { ProductsCategoryFieldType } from "../DAL/Products/Dtos/IProductCategoryFieldDto";
 
 export default function BrowseProducts() {
     const navigate = useNavigate();
@@ -46,6 +49,8 @@ export default function BrowseProducts() {
 
     const [wasFirstSearchHit, setWasFirstSearchHit] = useState<boolean>(false);
 
+    const [categoryDistinctFieldValues, setCategoryDistinctFieldValues] = useState<IProductCategoryDistinctFieldValuesDto[]>([]);
+
     useEffect(() => {
         if (!categoryId) {
             navigate('/');
@@ -59,6 +64,7 @@ export default function BrowseProducts() {
         setIsLoading(true);
 
         setSelectedCategory(await ProductsSelectingService.getCategoryById(+categoryId!));
+        setCategoryDistinctFieldValues(await ProductsSelectingService.getDistinctCategoryFieldValues(+categoryId!));
 
         setIsLoading(false);
     }
@@ -178,7 +184,7 @@ export default function BrowseProducts() {
                     wasFirstSearchHit &&
                     <>
                         <div className="row">
-                            <div className="col-md-4">
+                            <div className="col-md-3">
                                 <div className="card shadow-sm">
                                     <div className="card-header">
                                         <i className="fa fa-filter"></i>
@@ -190,7 +196,7 @@ export default function BrowseProducts() {
                                                 Nazwa:
                                             </div>
                                             <div className="mb-2">
-                                                <input type="text" name="name" id="name" className="form-control"
+                                                <input type="text" name="name" id="name" className="form-control form-control-sm"
                                                     value={searchRequest.name} onChange={(e) => setSearchRequest({
                                                         ...searchRequest,
                                                         name: e.target.value
@@ -203,12 +209,12 @@ export default function BrowseProducts() {
                                             <div className="mb-2">
                                                 <div className="d-flex align-items-center flex-row gap-2">
                                                     <div className="flex-grow-1">
-                                                        <div className="input-group">
+                                                        <div className="input-group input-group-sm">
                                                             <input type="number" name="dailyPriceFrom" id="dailyPriceFrom" className="form-control" step="0.01"
                                                                 value={searchRequest.dailyPriceFrom ?? ''} onChange={(e) => setSearchRequest({
                                                                     ...searchRequest,
                                                                     dailyPriceFrom: e.target.value === '' ? undefined : +e.target.value
-                                                                })} min={0}/>
+                                                                })} min={0} placeholder="od"/>
                                                             <div className="input-group-text">zł</div>
                                                         </div>
                                                     </div>
@@ -216,12 +222,12 @@ export default function BrowseProducts() {
                                                         -
                                                     </div>
                                                     <div className="flex-grow-1">
-                                                        <div className="input-group">
+                                                        <div className="input-group input-group-sm">
                                                             <input type="number" name="dailyPriceTo" id="dailyPriceTo" className="form-control" step="0.01"
                                                                 value={searchRequest.dailyPriceTo ?? ''} onChange={(e) => setSearchRequest({
                                                                     ...searchRequest,
                                                                     dailyPriceTo: e.target.value === '' ? undefined : +e.target.value
-                                                                })} min={0}/>
+                                                                })} min={0} placeholder="do"/>
                                                             <div className="input-group-text">zł</div>
                                                         </div>
                                                     </div>
@@ -234,12 +240,12 @@ export default function BrowseProducts() {
                                             <div className="mb-2">
                                                 <div className="d-flex align-items-center flex-row gap-2">
                                                     <div className="flex-grow-1">
-                                                        <div className="input-group">
+                                                        <div className="input-group input-group-sm">
                                                             <input type="number" name="ratingFrom" id="ratingFrom" className="form-control" min="1" max="5"
                                                                 value={searchRequest.ratingFrom ?? ''} onChange={(e) => setSearchRequest({
                                                                     ...searchRequest,
                                                                     ratingFrom: e.target.value === '' ? undefined : +e.target.value
-                                                                })}/>
+                                                                })} placeholder="od"/>
                                                             <div className="input-group-text">
                                                                 <i className="fa fa-star-o"></i>
                                                             </div>
@@ -249,17 +255,212 @@ export default function BrowseProducts() {
                                                         -
                                                     </div>
                                                     <div className="flex-grow-1">
-                                                        <div className="input-group">
+                                                        <div className="input-group input-group-sm">
                                                             <input type="number" name="ratingTo" id="ratingTo" className="form-control" min="1" max="5"
                                                                 value={searchRequest.ratingTo ?? ''} onChange={(e) => setSearchRequest({
                                                                     ...searchRequest,
                                                                     ratingTo: e.target.value === '' ? undefined : +e.target.value
-                                                                })}/>
+                                                                })} placeholder="do"/>
                                                             <div className="input-group-text">
                                                                 <div className="fa fa-star-o"></div>
                                                             </div>
                                                         </div>
                                                     </div>
+                                                </div>
+                                            </div>
+
+                                            <hr />
+
+                                            <div className="">
+                                                <div className="">
+                                                    {
+                                                        categoryDistinctFieldValues.map(field => (
+                                                            <div className="mb-2" key={field.id}>
+                                                                <div className="mb-2">
+                                                                    <div className="form-check">
+                                                                        <input type="checkbox" name={`field-chk-${field.id}`} id={`field-chk-${field.id}`} className="form-check-input"
+                                                                            checked={searchRequest.fieldValueFilters.some(x => x.fieldId === field.id)}
+                                                                            onChange={(e) => {
+                                                                                if (!e.target.checked) {
+                                                                                    setSearchRequest({
+                                                                                        ...searchRequest,
+                                                                                        fieldValueFilters: searchRequest.fieldValueFilters.filter(x => x.fieldId !== field.id)
+                                                                                    });
+                                                                                } else {
+                                                                                    setSearchRequest({
+                                                                                        ...searchRequest,
+                                                                                        fieldValueFilters: [
+                                                                                            ...searchRequest.fieldValueFilters,
+                                                                                            {
+                                                                                                fieldId: field.id,
+                                                                                                allowedTextValues: [],
+                                                                                                exactBoolValue: false
+                                                                                            }
+                                                                                        ]
+                                                                                    })
+                                                                                }
+                                                                            }}/>
+                                                                        <label htmlFor={`field-chk-${field.id}`} className="form-check-label">
+                                                                            {field.name}
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                                {
+                                                                    searchRequest.fieldValueFilters.some(x => x.fieldId === field.id) &&
+                                                                    <div className="ms-4 p-2 py-0 border-start border-3 ps-3">
+                                                                        {
+                                                                            field.type === ProductsCategoryFieldType.Text &&
+                                                                            <>
+                                                                                {
+                                                                                    field.items.map((item, idx) => (
+                                                                                        <div className="form-check" key={idx}>
+                                                                                            <input type="checkbox" name={`field-${field.id}-item-${idx}-chk`} id={`field-${field.id}-item-${idx}-chk`} className="form-check-input"
+                                                                                                checked={
+                                                                                                    searchRequest.fieldValueFilters
+                                                                                                        .find(x => x.fieldId === field.id)
+                                                                                                        ?.allowedTextValues.some(x => x === item) ?? false
+                                                                                                }
+                                                                                                onChange={(e) => {
+                                                                                                    const isChecked = e.target.checked;
+
+                                                                                                    setSearchRequest({
+                                                                                                        ...searchRequest,
+                                                                                                        fieldValueFilters: searchRequest.fieldValueFilters.map(filter =>
+                                                                                                            filter.fieldId === field.id
+                                                                                                            ? {
+                                                                                                                ...filter,
+                                                                                                                allowedTextValues: isChecked
+                                                                                                                    ? [...filter.allowedTextValues, item]
+                                                                                                                    : filter.allowedTextValues.filter(x => x !== item)
+                                                                                                            }
+                                                                                                            : filter
+                                                                                                        )
+                                                                                                    })
+                                                                                                }}/>
+                                                                                            <label htmlFor={`field-${field.id}-item-${idx}-chk`} className="form-check-label">
+                                                                                                {
+                                                                                                    item.trim() === '' ? '(pusta wartość)' : `${item} ${field.unitName ?? ''}`
+                                                                                                }
+                                                                                            </label>
+                                                                                        </div>
+                                                                                    ))
+                                                                                }
+                                                                            </>
+                                                                        }
+                                                                        {
+                                                                            field.type === ProductsCategoryFieldType.Boolean &&
+                                                                            <>
+                                                                                <select name={`field-${field.id}-bool-select`} id={`field-${field.id}-bool-select`} className="form-select form-select-sm"
+                                                                                    value={
+                                                                                        searchRequest.fieldValueFilters.find(x => x.fieldId === field.id)!.exactBoolValue === undefined
+                                                                                            ? '0'
+                                                                                            : searchRequest.fieldValueFilters.find(x => x.fieldId === field.id)!.exactBoolValue === false
+                                                                                                ? '0'
+                                                                                                : '1'
+                                                                                    }
+                                                                                    onChange={(e) => {
+                                                                                        const bValue = e.target.value === '0' ? false : true;
+
+                                                                                        setSearchRequest({
+                                                                                            ...searchRequest,
+                                                                                            fieldValueFilters: searchRequest.fieldValueFilters.map(filter =>
+                                                                                                filter.fieldId === field.id
+                                                                                                ? {
+                                                                                                    ...filter,
+                                                                                                    exactBoolValue: bValue
+                                                                                                }
+                                                                                                : filter
+                                                                                            )
+                                                                                        })
+                                                                                    }}>
+                                                                                    <option value="0">nie</option>
+                                                                                    <option value="1">tak</option>
+                                                                                </select>
+                                                                            </>
+                                                                        }
+                                                                        {
+                                                                            (field.type === ProductsCategoryFieldType.Integer || field.type === ProductsCategoryFieldType.Decimal) &&
+                                                                            <>
+                                                                                <div className="input-group input-group-sm mb-2">
+                                                                                    <input type="number" name={`field-${field.id}-exact-number`} id={`field-${field.id}-exact-number`} className="form-control form-control-sm" placeholder="dokładna wartość" step="0.01"
+                                                                                        value={
+                                                                                            searchRequest.fieldValueFilters.find(x => x.fieldId === field.id)!
+                                                                                                .exactNumberValue ?? ''
+                                                                                        }
+                                                                                        onChange={(e) => {
+                                                                                            setSearchRequest({
+                                                                                                ...searchRequest,
+                                                                                                fieldValueFilters: searchRequest.fieldValueFilters.map(filter =>
+                                                                                                    filter.fieldId === field.id
+                                                                                                    ? {
+                                                                                                        ...filter,
+                                                                                                        exactNumberValue: e.target.value === '' ? undefined : +e.target.value
+                                                                                                    }
+                                                                                                    : filter
+                                                                                                )
+                                                                                            })
+                                                                                        }}/>
+                                                                                    
+                                                                                    {
+                                                                                        field.unitName?.trim() !== '' &&
+                                                                                        <div className="input-group-text">
+                                                                                            {field.unitName}
+                                                                                        </div>
+                                                                                    }
+                                                                                </div>
+
+                                                                                <div className="d-flex align-items-center flex-row gap-2">
+                                                                                    <div className="flex-grow-1">
+                                                                                        <input type="number" name={`field-${field.id}-number-from`} id={`field-${field.id}-number-from`} className="form-control form-control-sm" placeholder="od"
+                                                                                            value={
+                                                                                                searchRequest.fieldValueFilters.find(x => x.fieldId === field.id)!
+                                                                                                    .numberValueFrom ?? ''   
+                                                                                            }
+                                                                                            onChange={(e) => {
+                                                                                                setSearchRequest({
+                                                                                                    ...searchRequest,
+                                                                                                    fieldValueFilters: searchRequest.fieldValueFilters.map(filter =>
+                                                                                                        filter.fieldId === field.id
+                                                                                                        ? {
+                                                                                                            ...filter,
+                                                                                                            numberValueFrom: e.target.value === '' ? undefined : +e.target.value
+                                                                                                        }
+                                                                                                        : filter
+                                                                                                    )
+                                                                                                })
+                                                                                            }}/>
+                                                                                    </div>
+                                                                                    <div className="flex-shrink-0">
+                                                                                        -
+                                                                                    </div>
+                                                                                    <div className="flex-grow-1">
+                                                                                        <input type="number" name={`field-${field.id}-number-to`} id={`field-${field.id}-number-to`} className="form-control form-control-sm" placeholder="do"
+                                                                                            value={
+                                                                                                searchRequest.fieldValueFilters.find(x => x.fieldId === field.id)!
+                                                                                                    .numberValueTo ?? ''
+                                                                                            }
+                                                                                            onChange={(e) => {
+                                                                                                setSearchRequest({
+                                                                                                    ...searchRequest,
+                                                                                                    fieldValueFilters: searchRequest.fieldValueFilters.map(filter =>
+                                                                                                        filter.fieldId === field.id
+                                                                                                        ? {
+                                                                                                            ...filter,
+                                                                                                            numberValueTo: e.target.value === '' ? undefined : +e.target.value
+                                                                                                        }
+                                                                                                        : filter
+                                                                                                    )
+                                                                                                })
+                                                                                            }}/>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </>
+                                                                        }
+                                                                    </div>
+                                                                }
+                                                            </div>
+                                                        ))
+                                                    }
                                                 </div>
                                             </div>
                                         </form>
@@ -272,25 +473,8 @@ export default function BrowseProducts() {
                                     </div>
                                 </div>
                             </div>
-                            <div className="col-md-8">
-                                Lorem ipsum dolor sit amet consectetur adipisicing elit. Deleniti fuga voluptatum et neque blanditiis porro dicta odio a corrupti in inventore, impedit aliquid rem iste doloribus illo libero voluptatibus numquam.
-                                Nihil corporis velit assumenda consequuntur inventore architecto adipisci libero odio quod labore, reiciendis ratione illo quaerat placeat consectetur molestias ab quasi eveniet, quae ut sequi, quos accusamus. Quae, accusantium? Autem?
-                                Pariatur quaerat officiis corrupti sequi, dolorem quasi impedit omnis eaque minima consequuntur nihil assumenda quae. Corrupti debitis, sit possimus nemo unde nobis repellat rerum delectus facere quos accusamus neque itaque?
-                                Vitae veniam enim quasi ullam harum sit doloribus illo, ea tempora et dolore repellendus odio modi accusantium quos ipsa, veritatis sequi? Autem suscipit aliquid saepe quos corrupti inventore dolore reiciendis.
-                                Deleniti maiores quia obcaecati molestiae sit, repellendus possimus quibusdam. Fuga delectus libero hic provident at rem odit beatae facere nobis sed possimus optio similique, cum placeat id voluptates sit omnis.
-                                Quis labore consequuntur temporibus soluta. Nemo mollitia ipsam adipisci eum officiis in. Ex nesciunt odit delectus? Cum nihil ipsam aut deleniti ipsa, architecto possimus veniam, recusandae iste accusamus alias debitis.
-                                Possimus, voluptatem! Ad cumque modi, error, illo quia sapiente corrupti voluptatem pariatur eligendi, veritatis quibusdam. Est, porro commodi? Libero tempora similique unde mollitia cumque voluptatibus iusto officiis doloribus corporis at!
-                                Voluptas, quidem quas unde earum quos sunt soluta magnam et tempore! Facere esse minima voluptas modi maiores. Aliquid praesentium maiores beatae suscipit minus a vel, dignissimos pariatur, corporis fugiat quibusdam.
-                                Omnis, assumenda consectetur accusamus iure optio sapiente eveniet nostrum quibusdam delectus nemo consequuntur quisquam repellendus sint sunt quasi maiores nam reiciendis quos ipsam fugit soluta atque modi. Numquam, impedit magnam.
-                                Nesciunt ratione voluptas, maxime tempore cupiditate provident? Vel libero excepturi minus doloribus consequuntur eum adipisci et dolorum odit temporibus. Dignissimos accusamus natus iure eligendi inventore eos eum vero sunt aperiam.
-                                Nemo eius similique nulla? Optio assumenda ab reiciendis soluta? Sed saepe repudiandae recusandae earum ut dignissimos possimus doloremque placeat, vel sint hic aliquid, voluptatem dolores similique perspiciatis libero, alias quidem.
-                                Quae, illo. Dolorum quam nemo minus, iure magnam iste tempore! Modi distinctio ipsa, voluptate aliquid eos itaque vero ab architecto obcaecati nihil. Tempora quia accusamus, dolor hic consectetur quam porro!
-                                Dolor corporis quasi tempore dolores sapiente dolore optio facere impedit beatae id, minus, ab nam quibusdam assumenda unde vel quis doloremque rem? Ab animi consequatur obcaecati in incidunt? Doloribus, necessitatibus?
-                                Enim dicta nisi perspiciatis laudantium repellendus repudiandae cum, temporibus molestias vitae fugiat modi beatae, ipsam nam accusamus asperiores autem et placeat sapiente officia illum minus, aperiam minima reiciendis? Velit, perferendis.
-                                Aliquid corporis ipsam possimus et repudiandae alias voluptatibus deleniti totam quasi. Nam maiores dolorum sunt quaerat nobis aliquid illum ab. Necessitatibus cum repudiandae repellat ad nisi aliquam ipsam corrupti nemo.
-                                Deserunt modi minus dignissimos explicabo quibusdam mollitia dolore praesentium unde assumenda illum. Quisquam ea molestias deleniti ipsam obcaecati accusamus velit nulla vitae facere! Consectetur asperiores aperiam eius, at magni explicabo?
-                                Illum praesentium maiores ipsam. Dolores error vel iure. Quod esse eos sapiente vitae animi debitis quia nihil itaque distinctio temporibus consequuntur quam harum, at rerum ipsa id quos placeat laborum.
-                                Modi illo ullam, quidem inventore quos praesentium ut doloribus, quod architecto atque placeat quo error aliquam impedit perferendis consequuntur tenetur nisi. Illo eaque, in ipsum consequuntur ut perspiciatis non debitis.
+                            <div className="col-md-9">
+                                
                             </div>
                         </div>
                     </>
