@@ -41,3 +41,7 @@
     white-space: nowrap;
     width: 1%;
 }
+
+input[type=number] {
+    -moz-appearance:textfield;
+}
