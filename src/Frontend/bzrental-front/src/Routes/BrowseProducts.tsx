@@ -12,6 +12,12 @@ import type { ISearchProductsFieldValueFilter, ISearchProductsRequest } from "..
 import type IProductFieldInfoDto from "../DAL/Products/Dtos/ProductFieldInfoDto";
 import type IProductCategoryDistinctFieldValuesDto from "../DAL/Products/Dtos/IProductCategoryDistinctFieldValuesDto";
 import { ProductsCategoryFieldType } from "../DAL/Products/Dtos/IProductCategoryFieldDto";
+import type IPaginationParameters from "../DAL/Shared/Models/IPaginationParameters";
+import type IPaginatedList from "../DAL/Shared/Models/IPaginatedList";
+import type IProductDto from "../DAL/Products/Dtos/IProductDto";
+import { Paginator } from "../Components/Paginator";
+import { ImageFromApi } from "../Components/ImageFromApi";
+import { RatingPresenter } from "../Components/RatingPresenter";
 
 export default function BrowseProducts() {
     const navigate = useNavigate();
@@ -51,6 +57,18 @@ export default function BrowseProducts() {
 
     const [categoryDistinctFieldValues, setCategoryDistinctFieldValues] = useState<IProductCategoryDistinctFieldValuesDto[]>([]);
 
+    const [pagination, setPagination] = useState<IPaginationParameters>({
+        pageNumber: 1,
+        pageSize: 25
+    });
+
+    const [products, setProducts] = useState<IPaginatedList<IProductDto>>({
+        pageNumber: 1,
+        pageSize: 25,
+        hasNextPage: false,
+        items: []
+    });
+
     useEffect(() => {
         if (!categoryId) {
             navigate('/');
@@ -59,6 +77,10 @@ export default function BrowseProducts() {
 
         refreshInitialData();
     }, []);
+
+    useEffect(() => {
+        refreshData();
+    }, [pagination.pageNumber, orderBy, wasFirstSearchHit]);
 
     async function refreshInitialData() {
         setIsLoading(true);
@@ -107,18 +129,30 @@ export default function BrowseProducts() {
         });
         
         setWasFirstSearchHit(true);
-        
-        await refreshData();
+
+        if (wasFirstSearchHit)
+            await refreshData();
     }
 
     async function refreshData() {
+        if (!wasFirstSearchHit)
+            return;
+
         setIsLoading(true);
         
+        setProducts(await ProductsSelectingService.searchProducts(
+            +categoryId!,
+            pagination,
+            searchRequest,
+            orderBy
+        ));
+
         setIsLoading(false);
     }
 
-    function handleSearchFormSubmit() {
-        
+    async function handleSearchFormSubmit(e: any) {
+        e.preventDefault();
+        await refreshData();
     }
 
     return (
@@ -474,7 +508,121 @@ export default function BrowseProducts() {
                                 </div>
                             </div>
                             <div className="col-md-9">
-                                
+                                <div className="row mb-4 g-2">
+                                    {
+                                        products.items.length === 0 &&
+                                        <span>
+                                            <div className="bg-warning-subtle border border-warning rounded shadow-sm p-4">
+                                                Brak przedmiotów w podanym zakresie filtrów.
+                                            </div>
+                                        </span>
+                                    }
+                                    {
+                                        products.items.map(prod => (
+                                            <div key={prod.id} className="col-lg-4 col-mg-6">
+                                                <div className="card shadow-sm h-100 position-relative">
+                                                    <ImageFromApi fileName={prod.firstImageFileName} className="card-img-top" style={{height: '200px', objectFit: 'cover', overflowClipMargin: 'unset'}}/>
+                                                    <div className="bg-light bg-opacity-75 position-absolute top-0 start-0 m-1 rounded px-1 shadow border border small"
+                                                        style={{backdropFilter: 'blur(15px)'}}>
+                                                        <RatingPresenter rating={prod.rating} className="d-inline"/>
+                                                        <span className="fw-semibold ms-2">{prod.rating}</span> <span className="text-secondary">({prod.reviewsCount})</span>
+                                                    </div>
+                                                    <div className="card-body">
+                                                        <h5 className="card-title">
+                                                            {prod.name}
+                                                        </h5>
+                                                        <div className="card-text">
+                                                            <div className="d-flex flex-row align-items-center justify-content-between">
+                                                                <h6>{prod.dailyPrice} zł/dzień</h6>
+                                                            </div>
+
+                                                            <div className="mt-2">
+                                                                {prod.description}
+                                                            </div>
+
+                                                            <hr />
+
+                                                            <div className="small">
+                                                                {
+                                                                    prod.fieldValues.map(field => (
+                                                                        <div key={field.id} className="row">
+                                                                            {
+                                                                                categoryDistinctFieldValues.some(x => x.id === field.id) &&
+                                                                                <>
+                                                                                    <div className="col-6">
+                                                                                        <div className="d-flex">
+                                                                                            <div className="text-truncate" title={categoryDistinctFieldValues.find(x => x.id == field.id)!.name ?? ''}>
+                                                                                                {
+                                                                                                    categoryDistinctFieldValues.find(x => x.id == field.id)!.name
+                                                                                                }
+                                                                                            </div>
+                                                                                            <div>:</div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div className="col-6">
+                                                                                        {
+                                                                                            categoryDistinctFieldValues.find(x => x.id == field.id)!.type === ProductsCategoryFieldType.Text &&
+                                                                                            <>
+                                                                                                <div className="text-truncate" title={field.textValue ?? ''}>
+                                                                                                    {
+                                                                                                        field.textValue ?? ''
+                                                                                                    }
+                                                                                                    {
+                                                                                                        categoryDistinctFieldValues.find(x => x.id == field.id)!.unitName ?? ''
+                                                                                                    }
+                                                                                                </div>
+                                                                                            </>
+                                                                                        }
+                                                                                        {
+                                                                                            (categoryDistinctFieldValues.find(x => x.id == field.id)!.type === ProductsCategoryFieldType.Integer || categoryDistinctFieldValues.find(x => x.id == field.id)!.type === ProductsCategoryFieldType.Decimal) &&
+                                                                                            <>
+                                                                                                {
+                                                                                                    field.numberValue ?? ''
+                                                                                                }
+                                                                                                {
+                                                                                                    categoryDistinctFieldValues.find(x => x.id == field.id)!.unitName ?? ''
+                                                                                                }
+                                                                                            </>
+                                                                                        }
+                                                                                        {
+                                                                                            categoryDistinctFieldValues.find(x => x.id == field.id)!.type === ProductsCategoryFieldType.Boolean &&
+                                                                                            <>
+                                                                                                {
+                                                                                                    field.boolValue === undefined
+                                                                                                        ? <i className="fa fa-times"></i>
+                                                                                                        : field.boolValue === false
+                                                                                                            ? <i className="fa fa-times"></i>
+                                                                                                            : <i className="fa fa-check"></i>
+                                                                                                }
+                                                                                            </>
+                                                                                        }
+                                                                                    </div>
+                                                                                </>
+                                                                            }
+                                                                        </div>
+                                                                    ))
+                                                                }
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="card-footer">
+                                                        <div className="btn btn-outline-secondary">
+                                                            <div className="d-flex align-items-center">
+                                                                <i className="fa fa-external-link"></i>
+                                                                <span className="ms-2">Przejdź</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+
+                                <Paginator
+                                    parameters={pagination}
+                                    list={products}
+                                    setParameters={setPagination}/>
                             </div>
                         </div>
                     </>
