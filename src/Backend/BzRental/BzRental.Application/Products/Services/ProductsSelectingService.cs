@@ -74,7 +74,10 @@ namespace BzRental.Application.Products.Services
                 if (fieldDef.Type == ProductsCategoryFieldType.Text)
                 {
                     query = _ctx.ProductFieldValues
-                        .Where(x => x.FieldId == fieldDef.Id)
+                        .Where(x =>
+                            x.FieldId == fieldDef.Id &&
+                            x.Product.CategoryId == categoryId
+                        )
                         .Select(x => new TempDistinctFieldValue
                         {
                             FieldId = x.FieldId,
@@ -84,7 +87,10 @@ namespace BzRental.Application.Products.Services
                 else if (fieldDef.Type is ProductsCategoryFieldType.Integer or ProductsCategoryFieldType.Decimal)
                 {
                     query = _ctx.ProductFieldValues
-                        .Where(x => x.FieldId == fieldDef.Id)
+                        .Where(x =>
+                            x.FieldId == fieldDef.Id &&
+                            x.Product.CategoryId == categoryId
+                        )
                         .Select(x => new TempDistinctFieldValue
                         {
                             FieldId = x.FieldId,
