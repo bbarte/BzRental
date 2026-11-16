@@ -224,7 +224,8 @@ namespace BzRental.Application.Products.Services
                     CreatedAt = x.CreatedAt,
                     FirstImageFileName = x.Images
                         .Select(x => x.FileName)
-                        .FirstOrDefault()
+                        .FirstOrDefault(),
+                    ReviewsCount = x.UserReviews.Count()
                 });
 
             if (!string.IsNullOrEmpty(orderBy))

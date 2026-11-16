@@ -8,5 +8,6 @@ export default interface IProductDto {
     categoryId: number,
     firstImageFileName?: string,
     rating: number,
+    reviewsCount: number,
     fieldValues: IProductFieldInfoDto[]
 }
