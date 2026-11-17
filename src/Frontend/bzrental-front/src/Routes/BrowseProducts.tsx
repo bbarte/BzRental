@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import AuthService from "../DAL/Auth/Services/AuthService";
 import { BzRentalNavbar } from "../Components/Layout/BzRentalNavbar";
 import BzRentalFooter from "../Components/Layout/BzRentalFooter";
@@ -606,12 +606,12 @@ export default function BrowseProducts() {
                                                         </div>
                                                     </div>
                                                     <div className="card-footer">
-                                                        <div className="btn btn-outline-secondary">
+                                                        <Link to={`/products/${prod.id}?rentingStartDate=${searchRequest.startDate}&rentingEndDate=${searchRequest.endDate}`} target="_blank" className="btn btn-outline-secondary">
                                                             <div className="d-flex align-items-center">
                                                                 <i className="fa fa-external-link"></i>
                                                                 <span className="ms-2">Przejdź</span>
                                                             </div>
-                                                        </div>
+                                                        </Link>
                                                     </div>
                                                 </div>
                                             </div>
