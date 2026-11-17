@@ -351,8 +351,8 @@ namespace BzRental.Application.Products.Services
                 .Where(x =>
                     x.ProductId == productId &&
                     x.DoesReserveProduct &&
-                    x.StartDate <= startDate &&
-                    x.EndDate >= endDate)
+                    x.StartDate <= endDate &&
+                    x.EndDate >= startDate)
                 .AnyAsync();
 
             List<ProductAvailibiltyPlannedRentingDto> plannedRentings = await _ctx.ProductRentings
