@@ -364,6 +364,7 @@ namespace BzRental.Application.Products.Services
                     StartDate = x.StartDate,
                     EndDate = x.EndDate
                 })
+                .OrderBy(x => x.StartDate)
                 .ToListAsync();
 
             return new ProductAvailabilityDto
