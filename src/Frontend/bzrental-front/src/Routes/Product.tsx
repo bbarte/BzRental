@@ -17,6 +17,12 @@ import type IProductReviewDto from "../DAL/Products/Dtos/IProductReviewDto";
 import ProductUserReviewsService from "../DAL/Products/Services/ProductUserReviewsService";
 import { Paginator } from "../Components/Paginator";
 import { InfoMessagesList } from "../Components/InfoMessagesList";
+import type IIsProductRentedByUserDto from "../DAL/Products/Dtos/IIsProductRentedByUserDto";
+import type IPlanProductRentingRequest from "../DAL/ProductsRenting/Requests/IPlanProductRentingRequest";
+import { type IProductAvailabilityDto } from "../DAL/Products/Dtos/IProductAvailabilityDto";
+import { ErrorMessagesList } from "../Components/ErrorMessagesList";
+import { ApiError } from "../DAL/ApiAccess/ApiError";
+import ProductsRentingService from "../DAL/ProductsRenting/Services/ProductsRentingService";
 
 export default function Product() {
     const navigate = useNavigate();
@@ -37,6 +43,8 @@ export default function Product() {
         fieldValues: []
     });
     const [categoryFields, setCategoryFields] = useState<IProductFieldInfoDto[]>([]);
+
+    // opinie
 
     const [addUpdateReviewRequest, setAddUpdateReviewRequest] = useState<IAddUpdateProductReviewRequest>({
         rating: 3,
@@ -59,11 +67,61 @@ export default function Product() {
 
     const [reviewsInfoMessages, setReviewsInfoMessages] = useState<string[]>([]);
 
+    // wypożyczenia
+
+    const [isProductRentedByUser, setIsProductRentedByUser] = useState<IIsProductRentedByUserDto>({
+        isIt: false,
+        rentingId: 0,
+        status: ''
+    });
+
+    const [planProductRentingRequest, setPlanProductRentingRequest] = useState<IPlanProductRentingRequest>({
+        startDate: '',
+        endDate: '',
+        userComments: ''
+    });
+
+    const [rentingAvaibility, setRentingAvailibilty] = useState<IProductAvailabilityDto>({
+        isAvailable: false,
+        plannedRentings: []
+    });
+
+    useEffect(() => {
+        refreshRentingAvaibility();
+    }, [planProductRentingRequest.startDate, planProductRentingRequest.endDate]);
+
+    const [rentingsInfoMessages, setRentingsInfoMessages] = useState<string[]>([]);
+    const [rentingsErrorMessages, setRentingsErrorMessages] = useState<string[]>([]);
+
+    async function refreshRentingAvaibility() {
+        if (isProductRentedByUser.isIt ||
+            !planProductRentingRequest.startDate ||
+            !planProductRentingRequest.endDate
+        )
+        {
+            return;
+        }
+
+        setRentingAvailibilty(await ProductsSelectingService.checkProductAvailability(
+            +id!,
+            planProductRentingRequest.startDate,
+            planProductRentingRequest.endDate
+        ));
+    }
+
+    // ---
+
     useEffect(() => {
         if (!initialRentingStartDate || !initialRentingEndDate) {
             navigate('/');
             return;
         }
+
+        setPlanProductRentingRequest({
+            ...planProductRentingRequest,
+            startDate: initialRentingStartDate,
+            endDate: initialRentingEndDate
+        });
 
         refreshData();
     }, []);
@@ -79,6 +137,7 @@ export default function Product() {
 
         setProduct(prod);
         setCategoryFields(await ProductsSelectingService.getCategoryFields(prod.categoryId));
+        await refreshProductsRentingInfo();
 
         await refreshUsersReview();
 
@@ -87,6 +146,11 @@ export default function Product() {
 
     async function refreshProduct() {
         setProduct(await ProductsSelectingService.getProductById(+id!));
+        await refreshProductsRentingInfo();
+    }
+
+    async function refreshProductsRentingInfo() {
+        setIsProductRentedByUser(await ProductsSelectingService.checkIfProductIsRentedByUser(+id!));
     }
 
     async function refreshUsersReview() {
@@ -177,6 +241,78 @@ export default function Product() {
         setIsLoading(false);
     }
 
+    async function handlePlanRentingFormSubmit(e: any) {
+        e.preventDefault();
+
+        if (isProductRentedByUser.isIt)
+            return;
+
+        setRentingsInfoMessages([]);
+        setRentingsErrorMessages([]);
+
+        refreshRentingAvaibility();
+
+        if (!planProductRentingRequest.startDate || !planProductRentingRequest.endDate) {
+            setRentingsErrorMessages(['Należy podać okres wypożyczenia!']);
+            return;
+        }
+
+        if (planProductRentingRequest.startDate > planProductRentingRequest.endDate) {
+            setRentingsErrorMessages(['Podane ramy czasowe są nieprawidłowe!']);
+            return;
+        }
+
+        const today = new Date().toLocaleDateString('en-CA');
+
+        if (planProductRentingRequest.startDate < today) {
+            setRentingsErrorMessages(['Data rozpoczęcia nie może być przeszła!']);
+            return;
+        }
+        
+        if (planProductRentingRequest.endDate < today) {
+            setRentingsErrorMessages(['Data zakończenia nie może być przeszła!']);
+            return;
+        }
+
+        if (planProductRentingRequest.startDate == planProductRentingRequest.endDate) {
+            setRentingsErrorMessages(['Okres wypożyczenia musi trwać co najmniej jeden dzień!']);
+            return;
+        }
+
+        setIsLoading(true);
+
+        try {
+            await ProductsRentingService.planRenting(
+                +id!,
+                planProductRentingRequest
+            );
+        }
+        catch (e) {
+            if (e instanceof ApiError) {
+                setRentingsErrorMessages(e.getTranslations([
+                    {
+                        code: 'ProductsRenting.AlreadyReservedByUser',
+                        msg: 'Zaplanowano już wypożyczenie tego przedmiotu w tych ramach czasowych'
+                    },
+                    {
+                        code: 'ProductsRenting.NotAvailable',
+                        msg: 'Przedmiot jest niedostępny w podanych ramach czasowych'
+                    }
+                ]));
+
+                return;
+            }
+        }
+        finally {
+            await refreshProductsRentingInfo();
+            await refreshRentingAvaibility();
+
+            setIsLoading(false);
+        }
+
+        setRentingsInfoMessages(['Zaplanowano wypożyczenie przedmiotu!']);
+    }
+
     return (
         <>
             <BzRentalNavbar
@@ -186,7 +322,7 @@ export default function Product() {
             <div className="container pt-4">
                 <div className="row g-3">
                     <div className="col-8">
-                        <div className="carousel slide rounded shadow-sm carousel-fade" id="mainGalleryCarousel" data-bs-ride="carousel">
+                        <div className="carousel slide rounded shadow carousel-fade" id="mainGalleryCarousel" data-bs-ride="carousel">
                             <div className="carousel-inner">
                                 {
                                     product.imageFileNames.map((path, idx) => (
@@ -294,18 +430,10 @@ export default function Product() {
                                 </div>
                             </div>
                         </div>
-                        <div className="card shadow-sm">
-                            <div className="card-header">
-                                <i className="fa fa-handshake-o"></i>
-                                <span className="ms-2">Wypożycz</span>
-                            </div>
-                            <div className="card-body">
-                            </div>
-                        </div>
                     </div>
                 </div>
 
-                <div className="row">
+                <div className="row g-3 mt-3">
                     <div className="col-8">
                         <div className="card shadow-sm mb-3">
                             <div className="card-header">
@@ -424,7 +552,7 @@ export default function Product() {
                                         <div className="p-2">
                                             {
                                                 reviews.items.map(rev => (
-                                                    <div className="card mb-2">
+                                                    <div key={rev.id} className="card mb-2">
                                                         <div className="card-body">
                                                             <div>
                                                                 <div className="d-flex flex-row align-items-center justify-content-between">
@@ -471,7 +599,114 @@ export default function Product() {
                             </div>
                         </div>
                     </div>
-                    <div className="col-4"></div>
+                    <div className="col-4">
+                        <div className="card shadow-sm">
+                            <div className="card-header">
+                                <i className="fa fa-handshake-o"></i>
+                                <span className="ms-2">Wypożyczanie</span>
+                            </div>
+                            <div className="card-body">
+                                <InfoMessagesList messages={rentingsInfoMessages} className="mb-2 small border"/>
+                                <ErrorMessagesList errors={rentingsErrorMessages} className="mb-2 small"/>
+
+                                {
+                                    isProductRentedByUser.isIt &&
+                                    <>
+                                        <div>
+                                            <i className="fa fa-check"></i>
+                                            <span className="ms-2">Ten przedmiot jest przez Ciebie wypożyczony w tej chwili.</span>
+                                        </div>   
+                                    </>
+                                }
+                                {
+                                    !isProductRentedByUser.isIt &&
+                                    <>
+                                        <form id="plan-renting-form" onSubmit={handlePlanRentingFormSubmit}>
+                                            <div className="mb-2">
+                                                Na okres:
+                                                <div className="d-flex align-items-center flex-row gap-2 small mt-2">
+                                                    <div className="flex-grow-1">
+                                                        <input type="date" name="startDate" id="startDate" className="form-control form-control-sm"
+                                                            value={planProductRentingRequest.startDate} onChange={(e) => setPlanProductRentingRequest({
+                                                                ...planProductRentingRequest,
+                                                                startDate: e.target.value
+                                                            })}/>
+                                                    </div>
+                                                    <div className="flex-shrink-0">
+                                                        -
+                                                    </div>
+                                                    <div className="flex-grow-1">
+                                                        <input type="date" name="endDate" id="endDate" className="form-control form-control-sm"
+                                                            value={planProductRentingRequest.endDate} onChange={(e) => setPlanProductRentingRequest({
+                                                                ...planProductRentingRequest,
+                                                                endDate: e.target.value
+                                                            })}/>
+                                                    </div>
+                                                </div>
+                                                <div className="mt-2">
+                                                    {
+                                                        rentingAvaibility.isAvailable &&
+                                                        <div className="text-success">
+                                                            <i className="fa fa-check"></i>
+                                                            <span className="ms-2">Dostępne w podanych datach</span>
+                                                        </div>
+                                                    }
+                                                    {
+                                                        !rentingAvaibility.isAvailable &&
+                                                        <>
+                                                            <div className="text-danger mb-2">
+                                                                <i className="fa fa-times"></i>
+                                                                <span className="ms-2">Niedostępne w podanych datach</span>
+                                                            </div>
+                                                            <div className="card small">
+                                                                <div className="card-header">
+                                                                    <i className="fa fa-calendar"></i>
+                                                                    <span className="ms-2">Najbliższe rezerwacje</span>
+                                                                </div>
+                                                                <div className="card-body">
+                                                                    <ul className="mb-0">
+                                                                        {
+                                                                            rentingAvaibility.plannedRentings.map((renting, idx) => (
+                                                                                <li key={idx}>
+                                                                                    {new Date(renting.startDate).toLocaleDateString('pl-PL')}
+                                                                                    &nbsp;-&nbsp;
+                                                                                    {new Date(renting.endDate).toLocaleDateString('pl-PL')}
+                                                                                </li>
+                                                                            ))
+                                                                        }
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
+                                                        </>
+                                                    }
+                                                </div>
+                                            </div>
+                                            <div>
+                                                Opcjonalne komentarze:
+                                                <textarea name="rentComments" id="rentComments" className="mt-2 form-control form-control-sm" maxLength={512}
+                                                    value={planProductRentingRequest.userComments} onChange={(e) => setPlanProductRentingRequest({
+                                                        ...planProductRentingRequest,
+                                                        userComments: e.target.value
+                                                    })}></textarea>
+                                            </div>
+                                        </form>
+                                    </>
+                                }
+                            </div>
+                            <div className="card-footer d-flex flex-row justify-content-end">
+                                {
+                                    !isProductRentedByUser.isIt &&
+                                    <>
+                                        <button className="btn btn-success" type="submit" form="plan-renting-form"
+                                            disabled={!rentingAvaibility.isAvailable}>
+                                            <i className="fa fa-chevron-circle-right"></i>
+                                            <span className="ms-2">Wypożycz!</span>
+                                        </button>
+                                    </>
+                                }
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
