@@ -45,3 +45,30 @@
 input[type=number] {
     -moz-appearance:textfield;
 }
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    filter: drop-shadow(3px 3px 2px rgba(0, 0, 0, 0.5));
+}
+
+.carousel {
+    overflow: hidden;
+}
+
+.carousel-inner {
+  height: 0;
+  padding-bottom: 60%;
+}
+
+.carousel-item {
+  position: absolute !important;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.carousel-item img {
+  height: 100%;
+  object-fit: cover;
+}
