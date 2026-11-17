@@ -605,11 +605,11 @@ export default function BrowseProducts() {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className="card-footer">
+                                                    <div className="card-footer d-flex flex-row aling-items-center justify-content-end">
                                                         <Link to={`/products/${prod.id}?rentingStartDate=${searchRequest.startDate}&rentingEndDate=${searchRequest.endDate}`} target="_blank" className="btn btn-outline-secondary">
                                                             <div className="d-flex align-items-center">
-                                                                <i className="fa fa-external-link"></i>
-                                                                <span className="ms-2">Przejdź</span>
+                                                                <i className="fa fa-chevron-circle-right"></i>
+                                                                <span className="ms-2">Zobacz</span>
                                                             </div>
                                                         </Link>
                                                     </div>
