@@ -214,11 +214,16 @@ namespace BzRental.Application.Products.Services
 
         public async Task<Result> RecalculateProductRating(int id)
         {
-            double avg = await _ctx.ProductUserReviews
-                .Where(x => x.ProductId == id)
-                .AverageAsync(x => x.Rating);
+            double avg = 0;
 
-            avg = Math.Round(avg, 1);
+            if (await _ctx.ProductUserReviews.Where(x => x.ProductId == id).AnyAsync())
+            {
+                avg = await _ctx.ProductUserReviews
+                    .Where(x => x.ProductId == id)
+                    .AverageAsync(x => x.Rating);
+
+                avg = Math.Round(avg, 1);
+            }
 
             await _ctx.Products
                 .Where(x => x.Id == id)
