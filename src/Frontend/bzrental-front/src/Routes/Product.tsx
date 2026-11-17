@@ -23,6 +23,7 @@ import { type IProductAvailabilityDto } from "../DAL/Products/Dtos/IProductAvail
 import { ErrorMessagesList } from "../Components/ErrorMessagesList";
 import { ApiError } from "../DAL/ApiAccess/ApiError";
 import ProductsRentingService from "../DAL/ProductsRenting/Services/ProductsRentingService";
+import { ProductRentingStatus } from "../DAL/ProductsRenting/Dtos/IProductRentingDto";
 
 export default function Product() {
     const navigate = useNavigate();
@@ -612,10 +613,22 @@ export default function Product() {
                                 {
                                     isProductRentedByUser.isIt &&
                                     <>
-                                        <div>
+                                        <div className="small">
                                             <i className="fa fa-check"></i>
-                                            <span className="ms-2">Ten przedmiot jest przez Ciebie wypożyczony w tej chwili.</span>
+                                            <span className="ms-2">Ten przedmiot jest obecnie wypożyczony przez&nbsp;Ciebie</span>
                                         </div>   
+                                        <hr />
+                                        <div className="small">
+                                            Stan wypożyczenia:&nbsp;
+                                            {
+                                                isProductRentedByUser.status === ProductRentingStatus.Planned &&
+                                                'zaplanowane'
+                                            }
+                                            {
+                                                isProductRentedByUser.status === ProductRentingStatus.InProgress &&
+                                                'zatwierdzone, w trakcie'
+                                            }
+                                        </div>
                                     </>
                                 }
                                 {
@@ -701,6 +714,15 @@ export default function Product() {
                                             disabled={!rentingAvaibility.isAvailable}>
                                             <i className="fa fa-chevron-circle-right"></i>
                                             <span className="ms-2">Wypożycz!</span>
+                                        </button>
+                                    </>
+                                }
+                                {
+                                    isProductRentedByUser.isIt &&
+                                    <>
+                                        <button className="btn btn-primary">
+                                            <i className="fa fa-chevron-circle-right"></i>
+                                            <span className="ms-2">Zobacz szczegóły</span>
                                         </button>
                                     </>
                                 }
