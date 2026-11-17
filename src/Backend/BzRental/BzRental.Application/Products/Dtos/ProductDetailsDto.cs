@@ -18,6 +18,7 @@ namespace BzRental.Application.Products.Dtos
         public List<string> ImageFileNames { get; set; } = new();
 
         public double Rating { get; set; } = 0d;
+        public int ReviewsCount { get; set; }
         public List<ProductFieldInfoDto> FieldValues { get; set; } = new();
     }
 }

@@ -315,6 +315,7 @@ namespace BzRental.Application.Products.Services
                     CategoryId = x.CategoryId,
                     CategoryName = x.Category.Name,
                     Rating = x.Rating,
+                    ReviewsCount = x.UserReviews.Count(),
                     CreatedAt = x.CreatedAt
                 })
                 .FirstOrDefaultAsync();
