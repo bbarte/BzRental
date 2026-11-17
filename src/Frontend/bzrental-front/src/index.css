@@ -72,3 +72,7 @@ input[type=number] {
   height: 100%;
   object-fit: cover;
 }
+
+.table-hover tbody tr.no-hover:hover > * {
+    --bs-table-bg-state: var(--bs-table-bg);
+}
