@@ -6,6 +6,7 @@ import logo from '../assets/bzrental_logo.png';
 import { Link } from "react-router-dom";
 import type IProductCategoryMinimalDto from "../DAL/Products/Dtos/IProductCategoryMinimalDto";
 import ProductsSelectingService from "../DAL/Products/Services/ProductsSelectingService";
+import ManageProductRentings from "./Admin/ManageProductRentings";
 
 export default function Main() {
     const [isUserLoggedIn, setIsUserLoggedIn] = useState<boolean>(AuthService.isLoggedIn);
@@ -45,17 +46,37 @@ export default function Main() {
         )
     }
 
-    return (
-        <>
-            <BzRentalNavbar
-                isUserLoggedIn={isUserLoggedIn}
-                handleLogout={handleLogout}/>
-
-            <div className="container">
-                <h1>Twoje wypożyczenia</h1>
-            </div>
-
-            <BzRentalFooter/>
-        </>
-    )
+    if (AuthService.isUserAdmin) {
+        return (
+            <>
+                <BzRentalNavbar
+                    isUserLoggedIn={isUserLoggedIn}
+                    handleLogout={handleLogout}/>
+    
+                <div className="container">
+                    <div className="text-center mb-4">
+                        <img src={logo} alt="" />
+                    </div>        
+                </div>
+    
+                <BzRentalFooter/>
+            </>
+        )
+    } else {
+        return (
+            <>
+                <BzRentalNavbar
+                    isUserLoggedIn={isUserLoggedIn}
+                    handleLogout={handleLogout}/>
+    
+                <div className="container">
+                    <div className="text-center mb-4">
+                        <img src={logo} alt="" />
+                    </div>        
+                </div>
+    
+                <BzRentalFooter/>
+            </>
+        )
+    }
 };
