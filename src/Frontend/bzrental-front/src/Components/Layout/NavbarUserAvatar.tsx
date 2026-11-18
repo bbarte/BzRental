@@ -20,13 +20,10 @@ export function NavbarUserAvatar({userInfo, handleLogout}: NavbarUserAvatarProps
 
                 <ul className="dropdown-menu shadow">
                     <li>
-                        <Link to='/' className="dropdown-item">Konto...</Link>
-                    </li>
-                    <li>
-                        <hr className="dropdown-divider" />
-                    </li>
-                    <li>
-                        <a style={{cursor: 'pointer'}} className="dropdown-item" onClick={handleLogout}>Wyloguj się</a>
+                        <a style={{cursor: 'pointer'}} className="dropdown-item" onClick={handleLogout}>
+                            <i className="fa fa-sign-out"></i>
+                            <span className="ms-2">Wyloguj się</span>
+                        </a>
                     </li>
                 </ul>
             </div>
