@@ -323,8 +323,8 @@ export default function ManageProductRentings() {
                                         <option value="">(brak sortowania)</option>
                                         <option value="asc(createdAt)">Data utworzenia: rosnąco</option>
                                         <option value="desc(createdAt)">Data utworzenia: malejąco</option>
-                                        <option value="asc(dailyPrice)">Cena za godz.: rosnąco</option>
-                                        <option value="desc(dailyPrice)">Cena za godz.: malejąco</option>
+                                        <option value="asc(dailyPrice)">Cena za dzień.: rosnąco</option>
+                                        <option value="desc(dailyPrice)">Cena za dzień.: malejąco</option>
                                         <option value="asc(currentRentValue)">Wartość: rosnąco</option>
                                         <option value="desc(currentRentValue)">Wartość: malejąco</option>
 
@@ -386,7 +386,7 @@ export default function ManageProductRentings() {
                                                 </td>
                                                 <td className="fit align-middle">
                                                     <div className="small">
-                                                        {rent.dailyPrice} zł/godz
+                                                        {rent.dailyPrice} zł/dzień
                                                         <br />
                                                         łącznie, szacowane: {rent.currentRentValue} zł
                                                     </div>
