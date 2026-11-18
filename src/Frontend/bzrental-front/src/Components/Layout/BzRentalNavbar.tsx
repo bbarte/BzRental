@@ -82,6 +82,11 @@ export function BzRentalNavbar({isUserLoggedIn, handleLogout}: BzRentalNavbarPro
                                             Wypożycz przedmioty
                                         </NavLink>
                                     </li>
+                                    <li>
+                                        <NavLink to='/my-rentings' className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                                            Moje wypożyczenia
+                                        </NavLink>
+                                    </li>
                                 </>
                             }
                         </ul>
