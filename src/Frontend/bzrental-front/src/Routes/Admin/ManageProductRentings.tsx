@@ -228,6 +228,12 @@ export default function ManageProductRentings() {
         setIsCheckoutSummaryModalOpen(true);
     }
 
+    async function handleSearchFormSubmit(e: any) {
+        e.preventDefault();
+
+        await refreshData();
+    }
+
     const today = new Date().toLocaleDateString('en-CA');
 
     return (
@@ -237,7 +243,7 @@ export default function ManageProductRentings() {
                 handleLogout={handleLogout}/>
 
             <div className="container">
-                <h1 className="mb-4">Wypożyczenia przedmiotów</h1>
+                <h1 className="mb-4">Zarządzanie wypożyczeniami</h1>
 
                 <InfoMessagesList messages={infoMessages} className="mb-3"/>
 
@@ -249,7 +255,7 @@ export default function ManageProductRentings() {
                                 <span className="ms-2">Filtry</span>
                             </div>
                             <div className="card-body small">
-                                <form id="search-form">
+                                <form id="search-form" onSubmit={handleSearchFormSubmit}>
                                     <div className="mb-2">
                                         Przedmiot:
                                     </div>

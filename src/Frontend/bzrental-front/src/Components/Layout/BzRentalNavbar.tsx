@@ -69,7 +69,7 @@ export function BzRentalNavbar({isUserLoggedIn, handleLogout}: BzRentalNavbarPro
                                             <hr className="dropdown-divider" />
                                         </li>
                                         <li>
-                                            <NavLink to='/admin/rentings' className='dropdown-item'>Wypożyczenia</NavLink>
+                                            <NavLink to='/admin/rentings' className='dropdown-item'>Zarządzaj wypożyczeniami</NavLink>
                                         </li>
                                     </ul>
                                 </li>
