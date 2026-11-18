@@ -81,6 +81,11 @@ export function AddProduct({handleSave, setIsOpened}: AddProductProps) {
             return;
         }
 
+        if (files.length === 0) {
+            setApiErrors(['Należy dodać przynajmniej jedno zdjęcie przedmiotu!']);
+            return;
+        }
+
         handleSave(request, files);
 
         setIsOpened(false);
