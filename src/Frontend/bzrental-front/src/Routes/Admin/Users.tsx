@@ -272,7 +272,7 @@ export default function Users() {
 
                 <div className="row">
                     <div className="col-md-4">
-                        <div className="card">
+                        <div className="card shadow-sm">
                             <div className="card-header">
                                 <span className="fa fa-filter"></span>
                                 <span className="ms-2">Filtry</span>

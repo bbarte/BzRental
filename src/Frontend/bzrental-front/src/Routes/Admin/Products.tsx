@@ -213,7 +213,7 @@ export default function Products() {
 
                 <div className="row">
                     <div className="col-md-4">
-                        <div className="card">
+                        <div className="card shadow-sm">
                             <div className="card-header">
                                 <i className="fa fa-filter"></i>
                                 <span className="ms-2">Filtry</span>
