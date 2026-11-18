@@ -1,4 +1,5 @@
 ﻿using BzRental.Application.Products.Dtos;
+using BzRental.Application.Products.Errors;
 using BzRental.Application.Products.Requests;
 using BzRental.DbAccess.Contexts;
 using BzRental.DbAccess.Extensions;
@@ -317,6 +318,9 @@ namespace BzRental.Application.Products.Services
 
         public async Task<Result> DeleteProduct(int id)
         {
+            if (await _ctx.ProductRentings.Where(x => x.ProductId == id && x.DoesReserveProduct).AnyAsync())
+                return ProductErrors.CantDelete;
+
             await _ctx.Products
                 .Where(x => x.Id == id)
                 .ExecuteUpdateAsync(setters => setters

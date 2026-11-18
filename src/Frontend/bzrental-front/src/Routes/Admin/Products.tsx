@@ -19,6 +19,7 @@ import { AddProduct } from "../../Components/Products/AddProduct";
 import type IAddProductRequest from "../../DAL/Products/Requests/IAddProductRequest";
 import { UpdateProduct } from "../../Components/Products/UpdateProduct";
 import type IUpdateProductRequest from "../../DAL/Products/Requests/IUpdateProductRequest";
+import { ApiError } from "../../DAL/ApiAccess/ApiError";
 
 export default function Products() {
     const navigate = useNavigate();
@@ -107,6 +108,20 @@ export default function Products() {
 
             setInfoMessages(['Usunięto wybrany przedmiot.']);
             await refreshData();
+        }
+        catch (e) {
+            if (e instanceof ApiError) {
+                setApiErrors(e.getTranslations([
+                    {
+                        code: 'Products.CantDelete',
+                        msg: 'Nie można usunąć przedmiotu, ponieważ jest on w chwili obecnej wynajmowany!'
+                    }
+                ]));
+
+                return;
+            }
+
+            throw e;
         }
         finally {
             setIsLoading(false);
