@@ -20,6 +20,8 @@ import { Modal } from "../../Components/Modal";
 import { CheckoutRentingSummaryDialog } from "../../Components/Rentings/CheckoutRentingSummaryDialog";
 import { PickUserDialog } from "../../Components/PickUserDialog";
 import type IUserDto from "../../DAL/Users/Dtos/IUserDto";
+import type IProductAdminDto from "../../DAL/Products/Dtos/IProductAdminDto";
+import { PickProductDialog } from "../../Components/PickProductDialog";
 
 export default function ManageProductRentings() {
     const navigate = useNavigate();
@@ -41,6 +43,7 @@ export default function ManageProductRentings() {
     const [filtersOrderBy, setFiltersOrderBy] = useState<string | null>(null);
 
     const [filtersCreatedByObject, setFiltersCreatedByObject] = useState<IUserDto | undefined>(undefined);
+    const [filtersProductObject, setFiltersProductObject] = useState<IProductAdminDto | undefined>(undefined);
 
     const [rentings, setRentings] = useState<IPaginatedList<IProductRentingDto>>({
         pageNumber: 1,
@@ -66,6 +69,7 @@ export default function ManageProductRentings() {
     });
 
     const [isPickUserModalOpen, setIsPickUserModalOpen] = useState<boolean>(false);
+    const [isPickProductModalOpen, setIsPickProductModalOpen] = useState<boolean>(false);
 
     useEffect(() => {
         refreshData();
@@ -250,6 +254,16 @@ export default function ManageProductRentings() {
         setFiltersCreatedByObject(undefined);
     }
 
+    function handlePickProductModalEvent(prod: IProductAdminDto) {
+        setFiltersProductId(prod.id);
+        setFiltersProductObject(prod);
+    }
+
+    function handleRemovePickedProduct() {
+        setFiltersProductId(null);
+        setFiltersProductObject(undefined);
+    }
+
     const today = new Date().toLocaleDateString('en-CA');
 
     return (
@@ -274,6 +288,24 @@ export default function ManageProductRentings() {
                                 <form id="search-form" onSubmit={handleSearchFormSubmit}>
                                     <div className="mb-2">
                                         Przedmiot:
+
+                                        <div className="mt-2">
+                                            <div className="input-group input-group-sm">
+                                                <input type="text" name="" id="" className="form-control" readOnly
+                                                    value={!filtersProductObject? '(dowolny)' : `${filtersProductObject.name} (${filtersProductObject.categoryName})`}/>
+                                                <button className="btn btn-outline-secondary"
+                                                    onClick={() => {
+                                                        setIsPickProductModalOpen(true);
+                                                    }}>
+                                                    Wybierz
+                                                </button>
+                                                <button className="btn btn-outline-secondary"
+                                                    onClick={handleRemovePickedProduct}
+                                                    disabled={filtersProductId === null}>
+                                                    <i className="fa fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div className="mb-2">
                                         Użytkownik:
@@ -575,6 +607,17 @@ export default function ManageProductRentings() {
                 <PickUserDialog
                     setIsOpened={setIsPickUserModalOpen}
                     handlePick={handlePickUserModalEvent}/>
+            </Modal>
+
+            <Modal
+                isOpened={isPickProductModalOpen}
+                setIsOpened={setIsPickProductModalOpen}
+                title="Wybór przedmiotu"
+                className="modal-lg"
+            >
+                <PickProductDialog
+                    setIsOpened={setIsPickProductModalOpen}
+                    handlePick={handlePickProductModalEvent}/>
             </Modal>
 
             <BzRentalFooter/>
