@@ -6,7 +6,7 @@ export default interface ICheckoutRentingSummaryDto {
     productCategoryName: string,
     plannedStartDate: string,
     actualStartDate: string,
-    plannedEndName: string,
+    plannedEndDate: string,
     actualEndDate: string,
     dailyPrice: number,
     totalValue: number
