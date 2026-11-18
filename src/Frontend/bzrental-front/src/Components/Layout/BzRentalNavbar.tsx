@@ -65,8 +65,29 @@ export function BzRentalNavbar({isUserLoggedIn, handleLogout}: BzRentalNavbarPro
                                         <li>
                                             <NavLink to='/admin/products' className='dropdown-item'>Przedmioty</NavLink>
                                         </li>
+                                        <li>
+                                            <hr className="dropdown-divider" />
+                                        </li>
+                                        <li>
+                                            <NavLink to='/admin/rentings' className='dropdown-item'>Wypożyczenia</NavLink>
+                                        </li>
                                     </ul>
                                 </li>
+                            }
+                            {
+                                isUserLoggedIn &&
+                                <>
+                                    <li>
+                                        <NavLink to='/browse-categories' className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                                            Wypożycz przedmioty
+                                        </NavLink>
+                                    </li>
+                                    <li>
+                                        <NavLink to='/my-rentings' className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+                                            Moje wypożyczenia
+                                        </NavLink>
+                                    </li>
+                                </>
                             }
                         </ul>
 

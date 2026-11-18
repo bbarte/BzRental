@@ -4,6 +4,8 @@ using BzRental.DbAccess.Contexts;
 using BzRental.DbAccess.Extensions;
 using BzRental.Domain.Products.Enums;
 using BzRental.Domain.Products.Models;
+using BzRental.Domain.ProductsRenting.Enums;
+using BzRental.Shared.Abstraction;
 using BzRental.Shared.Contracts.Dtos;
 using BzRental.Shared.Errors;
 using BzRental.Shared.Extensions;
@@ -37,13 +39,16 @@ namespace BzRental.Application.Products.Services
         }
 
         private readonly BzRentalDbContext _ctx;
+        private readonly IUserProvider _userProvider;
         private readonly IValidator<SearchProductsRequest> _searchValidator;
 
         public ProductsSelectingService(
             BzRentalDbContext ctx,
+            IUserProvider userProvider,
             IValidator<SearchProductsRequest> searchValidator)
         {
             _ctx = ctx;
+            _userProvider = userProvider;
             _searchValidator = searchValidator;
         }
 
@@ -69,7 +74,10 @@ namespace BzRental.Application.Products.Services
                 if (fieldDef.Type == ProductsCategoryFieldType.Text)
                 {
                     query = _ctx.ProductFieldValues
-                        .Where(x => x.FieldId == fieldDef.Id)
+                        .Where(x =>
+                            x.FieldId == fieldDef.Id &&
+                            x.Product.CategoryId == categoryId
+                        )
                         .Select(x => new TempDistinctFieldValue
                         {
                             FieldId = x.FieldId,
@@ -79,7 +87,10 @@ namespace BzRental.Application.Products.Services
                 else if (fieldDef.Type is ProductsCategoryFieldType.Integer or ProductsCategoryFieldType.Decimal)
                 {
                     query = _ctx.ProductFieldValues
-                        .Where(x => x.FieldId == fieldDef.Id)
+                        .Where(x =>
+                            x.FieldId == fieldDef.Id &&
+                            x.Product.CategoryId == categoryId
+                        )
                         .Select(x => new TempDistinctFieldValue
                         {
                             FieldId = x.FieldId,
@@ -213,7 +224,8 @@ namespace BzRental.Application.Products.Services
                     CreatedAt = x.CreatedAt,
                     FirstImageFileName = x.Images
                         .Select(x => x.FileName)
-                        .FirstOrDefault()
+                        .FirstOrDefault(),
+                    ReviewsCount = x.UserReviews.Count()
                 });
 
             if (!string.IsNullOrEmpty(orderBy))
@@ -303,6 +315,7 @@ namespace BzRental.Application.Products.Services
                     CategoryId = x.CategoryId,
                     CategoryName = x.Category.Name,
                     Rating = x.Rating,
+                    ReviewsCount = x.UserReviews.Count(),
                     CreatedAt = x.CreatedAt
                 })
                 .FirstOrDefaultAsync();
@@ -338,8 +351,8 @@ namespace BzRental.Application.Products.Services
                 .Where(x =>
                     x.ProductId == productId &&
                     x.DoesReserveProduct &&
-                    x.StartDate <= startDate &&
-                    x.EndDate >= endDate)
+                    x.StartDate <= endDate &&
+                    x.EndDate >= startDate)
                 .AnyAsync();
 
             List<ProductAvailibiltyPlannedRentingDto> plannedRentings = await _ctx.ProductRentings
@@ -351,6 +364,7 @@ namespace BzRental.Application.Products.Services
                     StartDate = x.StartDate,
                     EndDate = x.EndDate
                 })
+                .OrderBy(x => x.StartDate)
                 .ToListAsync();
 
             return new ProductAvailabilityDto
@@ -358,6 +372,47 @@ namespace BzRental.Application.Products.Services
                 IsAvailable = isAvailable,
                 PlannedRentings = plannedRentings
             };
+        }
+
+        public async Task<Result<IsProductRentedByUserDto>> CheckIfProductIsRentedByUser(int productId)
+        {
+            var getUserResult = _userProvider.GetUser();
+            if (getUserResult.IsFailure) return getUserResult.FailedCast<IsProductRentedByUserDto>();
+
+            SharedUser loggedUser = getUserResult.Value;
+
+            var rentInfo = await _ctx.ProductRentings
+                .Where(x =>
+                    x.ProductId == productId &&
+                    x.CreatedById == loggedUser.Id &&
+                    (
+                        x.Status == ProductRentingStatus.Planned ||
+                        x.Status == ProductRentingStatus.InProgress
+                    ) &&
+                    x.DoesReserveProduct)
+                .Select(x => new
+                {
+                    x.Id,
+                    x.Status
+                })
+                .FirstOrDefaultAsync();
+
+            if (rentInfo == null)
+            {
+                return new IsProductRentedByUserDto
+                {
+                    IsIt = false
+                };
+            }
+            else
+            {
+                return new IsProductRentedByUserDto
+                {
+                    IsIt = true,
+                    RentingId = rentInfo.Id,
+                    Status = rentInfo.Status
+                };
+            }
         }
     }
 }

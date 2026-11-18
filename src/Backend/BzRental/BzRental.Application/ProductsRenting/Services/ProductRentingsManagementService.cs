@@ -189,6 +189,9 @@ namespace BzRental.Application.ProductsRenting.Services
             if (DateTime.Now.Date > renting.EndDate.Date)
                 return ProductsRentingErrors.CantConfirmHandoverExpired;
 
+            if (DateTime.Now.Date < renting.StartDate.Date)
+                return ProductsRentingErrors.CantConfirmHandoverNotYet;
+
             renting.Status = ProductRentingStatus.InProgress;
             renting.DoesReserveProduct = true;
 
@@ -227,6 +230,9 @@ namespace BzRental.Application.ProductsRenting.Services
 
             if (renting.Status != ProductRentingStatus.Planned)
                 return ProductsRentingErrors.CantTurnDownStatus;
+
+            if (DateTime.Now.Date < renting.StartDate.Date)
+                return ProductsRentingErrors.CantTurnDownNotYet;
 
             renting.Status = ProductRentingStatus.UserDidNotShowUp;
             renting.DoesReserveProduct = false;

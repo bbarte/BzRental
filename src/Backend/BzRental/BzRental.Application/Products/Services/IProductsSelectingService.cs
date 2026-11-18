@@ -26,5 +26,7 @@ namespace BzRental.Application.Products.Services
             int productId,
             DateTime startDate,
             DateTime endDate);
+
+        Task<Result<IsProductRentedByUserDto>> CheckIfProductIsRentedByUser(int productId);
     }
 }

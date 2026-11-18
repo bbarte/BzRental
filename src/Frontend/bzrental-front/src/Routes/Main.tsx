@@ -1,7 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BzRentalFooter from "../Components/Layout/BzRentalFooter";
 import { BzRentalNavbar } from "../Components/Layout/BzRentalNavbar";
 import AuthService from "../DAL/Auth/Services/AuthService";
+import logo from '../assets/bzrental_logo.png';
+import { Link } from "react-router-dom";
+import type IProductCategoryMinimalDto from "../DAL/Products/Dtos/IProductCategoryMinimalDto";
+import ProductsSelectingService from "../DAL/Products/Services/ProductsSelectingService";
+import ManageProductRentings from "./Admin/ManageProductRentings";
 
 export default function Main() {
     const [isUserLoggedIn, setIsUserLoggedIn] = useState<boolean>(AuthService.isLoggedIn);
@@ -10,17 +15,68 @@ export default function Main() {
         setIsUserLoggedIn(false);
     }
 
-    return (
-        <>
-            <BzRentalNavbar
-                isUserLoggedIn={isUserLoggedIn}
-                handleLogout={handleLogout}/>
+    const [categories, setCategories] = useState<IProductCategoryMinimalDto[]>([]);
 
-            <div className="container">
-                <h1>Witaj, świecie!</h1>
-            </div>
+    useEffect(() => {
+        if (!isUserLoggedIn)
+            return;
 
-            <BzRentalFooter/>
-        </>
-    )
+        // setCategories(await )
+    }, [isUserLoggedIn]);
+
+    if (!isUserLoggedIn) {
+        return (
+            <>
+                <BzRentalNavbar
+                    isUserLoggedIn={isUserLoggedIn}
+                    handleLogout={handleLogout}/>
+
+                <div className="container">
+                    <div className="text-center">
+                        <img src={logo} alt="" />
+                    </div>
+
+                    <h5 className="mt-2 text-center">
+                        Aby korzystać z serwisu, należy się <Link to={'/login'}>zalogować</Link>.
+                    </h5>
+                </div>
+
+                <BzRentalFooter/>
+            </>
+        )
+    }
+
+    if (AuthService.isUserAdmin) {
+        return (
+            <>
+                <BzRentalNavbar
+                    isUserLoggedIn={isUserLoggedIn}
+                    handleLogout={handleLogout}/>
+    
+                <div className="container">
+                    <div className="text-center mb-4">
+                        <img src={logo} alt="" />
+                    </div>        
+                </div>
+    
+                <BzRentalFooter/>
+            </>
+        )
+    } else {
+        return (
+            <>
+                <BzRentalNavbar
+                    isUserLoggedIn={isUserLoggedIn}
+                    handleLogout={handleLogout}/>
+    
+                <div className="container">
+                    <div className="text-center mb-4">
+                        <img src={logo} alt="" />
+                    </div>        
+                </div>
+    
+                <BzRentalFooter/>
+            </>
+        )
+    }
 };

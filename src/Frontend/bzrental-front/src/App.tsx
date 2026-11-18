@@ -8,6 +8,12 @@ import ProtectedAdminRoute from './Routes/ProtectedAdminRoute'
 import Users from './Routes/Admin/Users'
 import ProductCategories from './Routes/Admin/ProductCategories'
 import Products from './Routes/Admin/Products'
+import ProtectedRoute from './Routes/ProtectedRoute'
+import BrowseCategories from './Routes/BrowseCategories'
+import BrowseProducts from './Routes/BrowseProducts'
+import Product from './Routes/Product'
+import ManageProductRentings from './Routes/Admin/ManageProductRentings'
+import MyRentings from './Routes/MyRentings'
 
 function App() {
   return (
@@ -22,6 +28,14 @@ function App() {
           <Route path='/admin/users' element={<Users/>}/>
           <Route path='/admin/product-categories' element={<ProductCategories/>}/>
           <Route path='/admin/products' element={<Products/>}/>
+          <Route path='/admin/rentings' element={<ManageProductRentings/>}/>
+        </Route>
+
+        <Route element={<ProtectedRoute/>}>
+          <Route path='/browse-categories' element={<BrowseCategories/>}/>
+          <Route path='/browse-products' element={<BrowseProducts/>}/>
+          <Route path='/products/:id' element={<Product/>}/>
+          <Route path='/my-rentings' element={<MyRentings/>}/>
         </Route>
 
         <Route path='*' element={<NotFound/>}/>

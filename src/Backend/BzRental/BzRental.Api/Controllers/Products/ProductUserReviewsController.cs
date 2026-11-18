@@ -30,6 +30,13 @@ namespace BzRental.Api.Controllers.Products
             return (await _service.GetReviews(productId, pagination, orderBy)).ToActionResult();
         }
 
+        [HttpGet("{productId}/reviews/own")]
+        public async Task<ActionResult<ProductReviewDto>> GetUsersReview(
+            [FromRoute] int productId)
+        {
+            return (await _service.GetUsersReview(productId)).ToActionResult();
+        }
+
         [HttpPost("{productId}/reviews")]
         public async Task<ActionResult<CreatedObjectDto<int>>> AddReview(
             [FromRoute] int productId,

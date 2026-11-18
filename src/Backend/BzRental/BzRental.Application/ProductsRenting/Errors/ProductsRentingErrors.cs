@@ -21,9 +21,15 @@ namespace BzRental.Application.ProductsRenting.Errors
         
         public static readonly Error CantConfirmHandoverExpired = new Error(
             "ProductsRenting.CantConfirmHandover.Expired", "Cannot handover this product, because its date frames are in the past.", FailureType.BadRequest);
+        
+        public static readonly Error CantConfirmHandoverNotYet = new Error(
+            "ProductsRenting.CantConfirmHandover.NotYet", "Cannot handover this product, because its planned date is still in the future.", FailureType.BadRequest);
 
         public static readonly Error CantTurnDownStatus = new Error(
             "ProductsRenting.CantTurnDown.Status", "Cannot turn down this renting plan, because it's not marked as planned.", FailureType.BadRequest);
+        
+        public static readonly Error CantTurnDownNotYet = new Error(
+            "ProductsRenting.CantTurnDown.NotYet", "Cannot turn down this renting plan, because it's planned date is still in the future.", FailureType.BadRequest);
         
         public static readonly Error CantCheckoutStatus = new Error(
             "ProductsRenting.CantCheckout.Status", "Cannot check out this renting, because it's not marked as in progress.", FailureType.BadRequest);

@@ -15,10 +15,37 @@ namespace BzRental.Api.Controllers.Products
     public class ProductsSelectingController : ControllerBase
     {
         private readonly IProductsSelectingService _service;
+        private readonly IProductsManagementService _managementService;
+        private readonly IProductCategoriesService _categoriesService;
 
-        public ProductsSelectingController(IProductsSelectingService service)
+        public ProductsSelectingController(
+            IProductsSelectingService service,
+            IProductsManagementService managementService,
+            IProductCategoriesService categoriesService)
         {
             _service = service;
+            _managementService = managementService;
+            _categoriesService = categoriesService;
+        }
+
+        [HttpGet("categories")]
+        public async Task<ActionResult<List<ProductCategoryMinimalDto>>> GetCategories()
+        {
+            return (await _categoriesService.GetMinimalProductCategories()).ToActionResult();
+        }
+
+        [HttpGet("categories/{id}")]
+        public async Task<ActionResult<ProductCategoryMinimalDto>> GetCategoryById(
+            [FromRoute] int id)
+        {
+            return (await _categoriesService.GetMinimalProductCategoryById(id)).ToActionResult();
+        }
+
+        [HttpGet("categories/{categoryId}/fields")]
+        public async Task<ActionResult<List<ProductFieldInfoDto>>> GetCategoryFields(
+            [FromRoute] int categoryId)
+        {
+            return (await _managementService.GetFieldsInfoForCategory(categoryId)).ToActionResult();
         }
 
         [HttpGet("categories/{categoryId}/distinct")]
@@ -52,6 +79,13 @@ namespace BzRental.Api.Controllers.Products
             [FromQuery] DateTime endDate)
         {
             return (await _service.CheckProductAvailibilty(productId, startDate, endDate)).ToActionResult();
+        }
+
+        [HttpPost("{productId}/check-if-rented-by-user-now")]
+        public async Task<ActionResult<IsProductRentedByUserDto>> CheckIfProductIsRentedByUser(
+            [FromRoute] int productId)
+        {
+            return (await _service.CheckIfProductIsRentedByUser(productId)).ToActionResult();
         }
     }
 }

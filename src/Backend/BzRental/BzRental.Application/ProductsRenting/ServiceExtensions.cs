@@ -23,6 +23,7 @@ namespace BzRental.Application.ProductsRenting
 
             services.AddScoped<IProductsRentPlanningService, ProductsRentPlanningService>();
             services.AddScoped<IProductsManagementService, ProductsManagementService>();
+            services.AddScoped<IProductRentingsManagementService, ProductRentingsManagementService>();
 
             return services;
         }
