@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import AuthService from "../DAL/Auth/Services/AuthService";
 import { BzRentalNavbar } from "../Components/Layout/BzRentalNavbar";
 import BzRentalFooter from "../Components/Layout/BzRentalFooter";
@@ -720,10 +720,10 @@ export default function Product() {
                                 {
                                     isProductRentedByUser.isIt &&
                                     <>
-                                        <button className="btn btn-primary">
+                                        <Link to='/my-rentings' className="btn btn-primary">
                                             <i className="fa fa-chevron-circle-right"></i>
                                             <span className="ms-2">Zobacz szczegóły</span>
-                                        </button>
+                                        </Link>
                                     </>
                                 }
                             </div>
