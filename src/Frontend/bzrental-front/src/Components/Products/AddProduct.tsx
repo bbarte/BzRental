@@ -7,6 +7,8 @@ import ProductsCategoriesAdminService from "../../DAL/Products/Services/Products
 import type IProductFieldInfoDto from "../../DAL/Products/Dtos/ProductFieldInfoDto";
 import ProductsAdminService from "../../DAL/Products/Services/ProductsAdminService";
 import { ProductsCategoryFieldType } from "../../DAL/Products/Dtos/IProductCategoryFieldDto";
+import type IProductCategoryDistinctFieldValuesDto from "../../DAL/Products/Dtos/IProductCategoryDistinctFieldValuesDto";
+import ProductsSelectingService from "../../DAL/Products/Services/ProductsSelectingService";
 
 export type AddProductProps = {
     handleSave: (request: IAddProductRequest, images: File[] | FileList) => any,
@@ -29,9 +31,19 @@ export function AddProduct({handleSave, setIsOpened}: AddProductProps) {
 
     const [minimalCategories, setMinimalCategories] = useState<IProductCategoryMinimalDto[]>([]);
 
+    const [categoryDistinctValues, setCategoryDistinctValues] = useState<IProductCategoryDistinctFieldValuesDto[]>([]);
+
     useEffect(() => {
         refreshMinimalCategories();
     }, []);
+
+    useEffect(() => {
+        refreshDistinctCategoryValues();
+    }, [request.categoryId])
+
+    async function refreshDistinctCategoryValues() {
+        setCategoryDistinctValues(await ProductsSelectingService.getDistinctCategoryFieldValues(request.categoryId));
+    }
 
     async function refreshMinimalCategories() {
         setIsLoading(true);
@@ -78,6 +90,11 @@ export function AddProduct({handleSave, setIsOpened}: AddProductProps) {
 
         if (request.dailyPrice <= 0) {
             setApiErrors(['Cena za dzień nie może być ujemna ani zerowa']);
+            return;
+        }
+
+        if (files.length === 0) {
+            setApiErrors(['Należy dodać przynajmniej jedno zdjęcie przedmiotu!']);
             return;
         }
 
@@ -195,38 +212,50 @@ export function AddProduct({handleSave, setIsOpened}: AddProductProps) {
                                         <div className="input-group">
                                             {
                                                 fieldInfo.type === ProductsCategoryFieldType.Text &&
-                                                <input
-                                                    type="text" className="form-control" maxLength={512}
-                                                    value={
-                                                        request.fieldValues.some(x => x.fieldId === fieldInfo.id)
-                                                            ? request.fieldValues.find(x => x.fieldId === fieldInfo.id)?.textValue ?? ''
-                                                            : ''
-                                                    }
-                                                    onChange={(e) => {
-                                                        const val = request.fieldValues.find(x => x.fieldId === fieldInfo.id);
-
-                                                        if (val !== undefined) {
-                                                            setRequest({
-                                                                ...request,
-                                                                fieldValues: request.fieldValues.map(x =>
-                                                                    x.fieldId === fieldInfo.id
-                                                                        ? { ...x, textValue: e.target.value }
-                                                                        : x
-                                                                )
-                                                            });
-                                                        } else {
-                                                            setRequest({
-                                                                ...request,
-                                                                fieldValues: [
-                                                                    ...request.fieldValues,
-                                                                    {
-                                                                        fieldId: fieldInfo.id,
-                                                                        textValue: e.target.value
-                                                                    }
-                                                                ]
-                                                            });
+                                                <>
+                                                    <input
+                                                        type="text" className="form-control" maxLength={512}
+                                                        list={`field-${fieldInfo.id}-datalist`}
+                                                        value={
+                                                            request.fieldValues.some(x => x.fieldId === fieldInfo.id)
+                                                                ? request.fieldValues.find(x => x.fieldId === fieldInfo.id)?.textValue ?? ''
+                                                                : ''
                                                         }
-                                                    }}/>
+                                                        onChange={(e) => {
+                                                            const val = request.fieldValues.find(x => x.fieldId === fieldInfo.id);
+
+                                                            if (val !== undefined) {
+                                                                setRequest({
+                                                                    ...request,
+                                                                    fieldValues: request.fieldValues.map(x =>
+                                                                        x.fieldId === fieldInfo.id
+                                                                            ? { ...x, textValue: e.target.value }
+                                                                            : x
+                                                                    )
+                                                                });
+                                                            } else {
+                                                                setRequest({
+                                                                    ...request,
+                                                                    fieldValues: [
+                                                                        ...request.fieldValues,
+                                                                        {
+                                                                            fieldId: fieldInfo.id,
+                                                                            textValue: e.target.value
+                                                                        }
+                                                                    ]
+                                                                });
+                                                            }
+                                                        }}/>
+
+                                                    <datalist id={`field-${fieldInfo.id}-datalist`}>
+                                                        {
+                                                            categoryDistinctValues.find(x => x.id === fieldInfo.id)?.items
+                                                            .map((item, idx) => (
+                                                                <option key={idx} value={item}/>
+                                                            ))
+                                                        }
+                                                    </datalist>
+                                                </>
                                             }
                                             {
                                                 (fieldInfo.type === ProductsCategoryFieldType.Integer || fieldInfo.type === ProductsCategoryFieldType.Decimal) &&

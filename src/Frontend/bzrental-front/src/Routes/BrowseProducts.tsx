@@ -122,19 +122,22 @@ export default function BrowseProducts() {
             return;
         }
 
-        setSearchRequest({
+        const updatedSearchRequest = {
             ...searchRequest,
             startDate: filterStartDate,
             endDate: filterEndDate
-        });
+        };
         
+        setSearchRequest(updatedSearchRequest);
+
         setWasFirstSearchHit(true);
 
-        if (wasFirstSearchHit)
-            await refreshData();
+        if (wasFirstSearchHit) {
+            await refreshData(updatedSearchRequest);
+        }
     }
 
-    async function refreshData() {
+    async function refreshData(request: ISearchProductsRequest = searchRequest) {
         if (!wasFirstSearchHit)
             return;
 
@@ -143,7 +146,7 @@ export default function BrowseProducts() {
         setProducts(await ProductsSelectingService.searchProducts(
             +categoryId!,
             pagination,
-            searchRequest,
+            request,
             orderBy
         ));
 

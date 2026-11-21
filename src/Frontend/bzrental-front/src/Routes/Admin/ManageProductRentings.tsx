@@ -18,6 +18,10 @@ import { ApiError } from "../../DAL/ApiAccess/ApiError";
 import type ICheckoutRentingSummaryDto from "../../DAL/ProductsRenting/Dtos/ICheckoutRentingSummaryDto";
 import { Modal } from "../../Components/Modal";
 import { CheckoutRentingSummaryDialog } from "../../Components/Rentings/CheckoutRentingSummaryDialog";
+import { PickUserDialog } from "../../Components/PickUserDialog";
+import type IUserDto from "../../DAL/Users/Dtos/IUserDto";
+import type IProductAdminDto from "../../DAL/Products/Dtos/IProductAdminDto";
+import { PickProductDialog } from "../../Components/PickProductDialog";
 
 export default function ManageProductRentings() {
     const navigate = useNavigate();
@@ -37,6 +41,9 @@ export default function ManageProductRentings() {
     const [filtersDateFrom, setFiltersDateFrom] = useState<string | null>(null);
     const [filtersDateTo, setFiltersDateTo] = useState<string | null>(null);
     const [filtersOrderBy, setFiltersOrderBy] = useState<string | null>(null);
+
+    const [filtersCreatedByObject, setFiltersCreatedByObject] = useState<IUserDto | undefined>(undefined);
+    const [filtersProductObject, setFiltersProductObject] = useState<IProductAdminDto | undefined>(undefined);
 
     const [rentings, setRentings] = useState<IPaginatedList<IProductRentingDto>>({
         pageNumber: 1,
@@ -60,6 +67,9 @@ export default function ManageProductRentings() {
         productCategoryName: '', plannedStartDate: '', actualStartDate: '', plannedEndDate: '', actualEndDate: '',
         dailyPrice: 0, totalValue: 0
     });
+
+    const [isPickUserModalOpen, setIsPickUserModalOpen] = useState<boolean>(false);
+    const [isPickProductModalOpen, setIsPickProductModalOpen] = useState<boolean>(false);
 
     useEffect(() => {
         refreshData();
@@ -228,6 +238,32 @@ export default function ManageProductRentings() {
         setIsCheckoutSummaryModalOpen(true);
     }
 
+    async function handleSearchFormSubmit(e: any) {
+        e.preventDefault();
+
+        await refreshData();
+    }
+
+    function handlePickUserModalEvent(user: IUserDto) {
+        setFiltersCreatedById(user.id);
+        setFiltersCreatedByObject(user);
+    }
+
+    function handleRemovePickedUser() {
+        setFiltersCreatedById(null);
+        setFiltersCreatedByObject(undefined);
+    }
+
+    function handlePickProductModalEvent(prod: IProductAdminDto) {
+        setFiltersProductId(prod.id);
+        setFiltersProductObject(prod);
+    }
+
+    function handleRemovePickedProduct() {
+        setFiltersProductId(null);
+        setFiltersProductObject(undefined);
+    }
+
     const today = new Date().toLocaleDateString('en-CA');
 
     return (
@@ -237,7 +273,7 @@ export default function ManageProductRentings() {
                 handleLogout={handleLogout}/>
 
             <div className="container">
-                <h1 className="mb-4">Wypożyczenia przedmiotów</h1>
+                <h1 className="mb-4">Zarządzanie wypożyczeniami</h1>
 
                 <InfoMessagesList messages={infoMessages} className="mb-3"/>
 
@@ -249,12 +285,48 @@ export default function ManageProductRentings() {
                                 <span className="ms-2">Filtry</span>
                             </div>
                             <div className="card-body small">
-                                <form id="search-form">
+                                <form id="search-form" onSubmit={handleSearchFormSubmit}>
                                     <div className="mb-2">
                                         Przedmiot:
+
+                                        <div className="mt-2">
+                                            <div className="input-group input-group-sm">
+                                                <input type="text" name="" id="" className="form-control" readOnly
+                                                    value={!filtersProductObject? '(dowolny)' : `${filtersProductObject.name} (${filtersProductObject.categoryName})`}/>
+                                                <button className="btn btn-outline-secondary"
+                                                    onClick={() => {
+                                                        setIsPickProductModalOpen(true);
+                                                    }}>
+                                                    Wybierz
+                                                </button>
+                                                <button className="btn btn-outline-secondary"
+                                                    onClick={handleRemovePickedProduct}
+                                                    disabled={filtersProductId === null}>
+                                                    <i className="fa fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div className="mb-2">
                                         Użytkownik:
+
+                                        <div className="mt-2">
+                                            <div className="input-group input-group-sm">
+                                                <input type="text" name="" id="" className="form-control" readOnly
+                                                    value={!filtersCreatedByObject ? '(dowolny)' : `${filtersCreatedByObject.firstName} ${filtersCreatedByObject.lastName}`}/>
+                                                <button className="btn btn-outline-secondary"
+                                                    onClick={() => {
+                                                        setIsPickUserModalOpen(true);
+                                                    }}>
+                                                    Wybierz
+                                                </button>
+                                                <button className="btn btn-outline-secondary"
+                                                    onClick={handleRemovePickedUser}
+                                                    disabled={filtersCreatedById === null}>
+                                                    <i className="fa fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div className="mb-2">
                                         Zakres dat:
@@ -525,6 +597,27 @@ export default function ManageProductRentings() {
                 <CheckoutRentingSummaryDialog
                     setIsOpened={setIsCheckoutSummaryModalOpen}
                     dto={checkoutSummaryModalDto}/>
+            </Modal>
+
+            <Modal
+                isOpened={isPickUserModalOpen}
+                setIsOpened={setIsPickUserModalOpen}
+                title="Wybór użytkownika"
+            >
+                <PickUserDialog
+                    setIsOpened={setIsPickUserModalOpen}
+                    handlePick={handlePickUserModalEvent}/>
+            </Modal>
+
+            <Modal
+                isOpened={isPickProductModalOpen}
+                setIsOpened={setIsPickProductModalOpen}
+                title="Wybór przedmiotu"
+                className="modal-lg"
+            >
+                <PickProductDialog
+                    setIsOpened={setIsPickProductModalOpen}
+                    handlePick={handlePickProductModalEvent}/>
             </Modal>
 
             <BzRentalFooter/>

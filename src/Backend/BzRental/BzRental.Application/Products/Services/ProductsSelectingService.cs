@@ -55,7 +55,7 @@ namespace BzRental.Application.Products.Services
         public async Task<Result<List<ProductCategoryDistinctFieldValuesDto>>> GetDistinctCategoryFieldValues(int categoryId)
         {
             List<ProductsCategoryField> fieldDefinitions = await _ctx.ProductsCategoryFields
-                .Where(x => x.CategoryId == categoryId)
+                .Where(x => x.CategoryId == categoryId && !x.IsDeleted)
                 .Select(x => new ProductsCategoryField
                 {
                     Id = x.Id,
@@ -76,7 +76,8 @@ namespace BzRental.Application.Products.Services
                     query = _ctx.ProductFieldValues
                         .Where(x =>
                             x.FieldId == fieldDef.Id &&
-                            x.Product.CategoryId == categoryId
+                            x.Product.CategoryId == categoryId &&
+                            !x.Product.IsDeleted
                         )
                         .Select(x => new TempDistinctFieldValue
                         {
@@ -89,7 +90,8 @@ namespace BzRental.Application.Products.Services
                     query = _ctx.ProductFieldValues
                         .Where(x =>
                             x.FieldId == fieldDef.Id &&
-                            x.Product.CategoryId == categoryId
+                            x.Product.CategoryId == categoryId &&
+                            !x.Product.IsDeleted
                         )
                         .Select(x => new TempDistinctFieldValue
                         {
