@@ -139,7 +139,7 @@ namespace BzRental.Application.Products.Services
         public async Task<Result<List<ProductFieldInfoDto>>> GetFieldsInfoForCategory(int id)
         {
             return await _ctx.ProductsCategoryFields
-                .Where(x => x.CategoryId == id)
+                .Where(x => x.CategoryId == id && !x.IsDeleted)
                 .Select(x => new ProductFieldInfoDto
                 {
                     Id = x.Id,
@@ -161,7 +161,7 @@ namespace BzRental.Application.Products.Services
                 return SharedErrors.NotFound;
 
             return await _ctx.ProductsCategoryFields
-                .Where(x => x.CategoryId == productsCategoryId)
+                .Where(x => x.CategoryId == productsCategoryId && !x.IsDeleted)
                 .Select(x => new ProductFieldInfoDto
                 {
                     Id = x.Id,
@@ -190,7 +190,7 @@ namespace BzRental.Application.Products.Services
         public async Task<Result<List<ProductFieldInfoDto>>> GetAllFieldsValuesForProductById(int id)
         {
             return await _ctx.ProductFieldValues
-                .Where(x => x.ProductId == id)
+                .Where(x => x.ProductId == id && !x.Field.IsDeleted)
                 .Select(x => new ProductFieldInfoDto
                 {
                     Id = x.FieldId,
